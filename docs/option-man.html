@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>wink(1)</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: #fff;
+      color: #111;
+      font-family: 'SF Mono', 'Fira Code', 'Cascadia Code', ui-monospace, monospace;
+      font-size: 14px;
+      line-height: 1.7;
+      padding: 48px 0;
+      max-width: 900px;
+      margin: 0 auto;
+    }
+
+    .man-header {
+      display: flex;
+      justify-content: space-between;
+      color: #111;
+      font-weight: 700;
+      margin-bottom: 32px;
+      padding: 0 48px;
+    }
+
+    section {
+      padding: 0 48px;
+      margin-bottom: 28px;
+    }
+
+    .section-title {
+      font-weight: 700;
+      color: #111;
+      margin-bottom: 8px;
+      text-transform: uppercase;
+      font-size: 14px;
+    }
+
+    .indent { padding-left: 32px; }
+    .indent2 { padding-left: 64px; }
+
+    .dim { color: #888; }
+    .cmd { color: #111; font-weight: 600; }
+    .arg { color: #555; }
+
+    /* tui embed */
+    .tui-embed {
+      margin: 0 48px 28px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      overflow: hidden;
+    }
+
+    .tui-bar {
+      background: #2c2c2e;
+      padding: 10px 14px;
+      display: flex;
+      align-items: center;
+      gap: 7px;
+    }
+
+    .tdot { width: 10px; height: 10px; border-radius: 50%; }
+    .tdot.r { background: #ff5f57; }
+    .tdot.y { background: #febc2e; }
+    .tdot.g { background: #28c840; }
+
+    .tbar-title {
+      flex: 1;
+      text-align: center;
+      font-size: 11px;
+      color: #555;
+      margin-right: 34px;
+    }
+
+    .tui-body {
+      background: #1c1c1e;
+      display: grid;
+      grid-template-columns: 160px 1fr;
+    }
+
+    .t-left {
+      border-right: 1px solid #2c2c2e;
+      padding: 10px 0;
+    }
+
+    .t-lbl {
+      font-size: 9px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: #444;
+      padding: 0 12px 8px;
+    }
+
+    .svc {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      padding: 6px 12px;
+      font-size: 11px;
+      border-bottom: 1px solid #242424;
+    }
+
+    .svc.sel { background: rgba(255,255,255,0.03); }
+    .svc .s { font-size: 7px; }
+    .svc .s.on { color: #30d158; }
+    .svc .s.err { color: #ff453a; }
+    .svc .n { font-weight: 600; }
+
+    .t-logs { overflow: hidden; }
+
+    .t-log-hd {
+      font-size: 9px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: #444;
+      padding: 10px 14px 6px;
+      border-bottom: 1px solid #242424;
+    }
+
+    .ll {
+      display: grid;
+      grid-template-columns: 76px 56px 1fr;
+      font-size: 11px;
+      line-height: 1;
+      padding: 4px 14px;
+    }
+
+    .ll:nth-child(even) { background: rgba(255,255,255,0.01); }
+    .ll-s { font-weight: 700; }
+    .ll-t { color: #444; }
+    .ll-m { color: #555; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .ll-m.ok  { color: #30d158; }
+    .ll-m.err { color: #ff453a; }
+    .ll-m.w   { color: #ffd60a; }
+
+    .tui-foot {
+      background: #2c2c2e;
+      border-top: 1px solid #3a3a3c;
+      padding: 6px 14px;
+      display: flex;
+      justify-content: space-between;
+      font-size: 10px;
+      color: #555;
+    }
+
+    .man-footer {
+      display: flex;
+      justify-content: space-between;
+      color: #111;
+      font-weight: 700;
+      margin-top: 32px;
+      padding: 0 48px;
+      border-top: 1px solid #eee;
+      padding-top: 24px;
+    }
+
+    a { color: #111; }
+
+    @media (max-width: 680px) {
+      body { padding: 24px 0; }
+      section, .man-header, .man-footer, .tui-embed { padding-left: 20px; padding-right: 20px; }
+      .tui-embed { margin-left: 20px; margin-right: 20px; }
+      .tui-body { grid-template-columns: 1fr; }
+      .t-left { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="man-header">
+    <span>WINK(1)</span>
+    <span>User Commands</span>
+    <span>WINK(1)</span>
+  </div>
+
+  <section>
+    <div class="section-title">name</div>
+    <div class="indent">wink - log aggregator for local dev services</div>
+  </section>
+
+  <section>
+    <div class="section-title">synopsis</div>
+    <div class="indent"><span class="cmd">wink</span> <span class="arg">[command]</span> <span class="arg">[args...]</span></div>
+  </section>
+
+  <section>
+    <div class="section-title">description</div>
+    <div class="indent">
+      Watch any process on your machine. stdout and stderr from every<br>
+      service, aggregated in a live terminal dashboard. Single binary,<br>
+      zero config, no cloud.
+    </div>
+  </section>
+
+  <section>
+    <div class="section-title">screenshot</div>
+  </section>
+
+  <div class="tui-embed">
+    <div class="tui-bar">
+      <div class="tdot r"></div><div class="tdot y"></div><div class="tdot g"></div>
+      <div class="tbar-title">wink · 4 services</div>
+    </div>
+    <div class="tui-body">
+      <div class="t-left">
+        <div class="t-lbl">services</div>
+        <div class="svc sel"><span class="s on">●</span><span class="n" style="color:#34c759">api</span></div>
+        <div class="svc"><span class="s on">●</span><span class="n" style="color:#ffd60a">worker</span></div>
+        <div class="svc"><span class="s on">●</span><span class="n" style="color:#bf5af2">postgres</span></div>
+        <div class="svc"><span class="s err">✗</span><span class="n" style="color:#ff453a">redis</span></div>
+      </div>
+      <div class="t-logs">
+        <div class="t-log-hd">all services</div>
+        <div class="ll"><span class="ll-s" style="color:#34c759">api</span><span class="ll-t">14:22:01</span><span class="ll-m ok">listening on :3000</span></div>
+        <div class="ll"><span class="ll-s" style="color:#bf5af2">postgres</span><span class="ll-t">14:22:01</span><span class="ll-m">database system ready</span></div>
+        <div class="ll"><span class="ll-s" style="color:#ffd60a">worker</span><span class="ll-t">14:22:02</span><span class="ll-m">connected to postgres</span></div>
+        <div class="ll"><span class="ll-s" style="color:#ff453a">redis</span><span class="ll-t">14:22:02</span><span class="ll-m err">connection refused :6379</span></div>
+        <div class="ll"><span class="ll-s" style="color:#34c759">api</span><span class="ll-t">14:22:03</span><span class="ll-m w">WARN redis unavailable</span></div>
+        <div class="ll"><span class="ll-s" style="color:#34c759">api</span><span class="ll-t">14:22:05</span><span class="ll-m">GET /users 200  12ms</span></div>
+        <div class="ll"><span class="ll-s" style="color:#ffd60a">worker</span><span class="ll-t">14:22:06</span><span class="ll-m">job queued #4421</span></div>
+        <div class="ll"><span class="ll-s" style="color:#ffd60a">worker</span><span class="ll-t">14:22:08</span><span class="ll-m ok">job #4421 processed</span></div>
+        <div class="ll"><span class="ll-s" style="color:#34c759">api</span><span class="ll-t">14:22:14</span><span class="ll-m err">ERROR TypeError at auth.js:42</span></div>
+      </div>
+    </div>
+    <div class="tui-foot">
+      <span>3 running · 1 dead</span>
+      <span>[tab] switch · [a] all · [s] stop · [q] quit</span>
+    </div>
+  </div>
+
+  <section>
+    <div class="section-title">commands</div>
+    <div class="indent">
+      <div><span class="cmd">wink watch</span> <span class="arg">&lt;name&gt; &lt;cmd&gt;</span></div>
+      <div class="indent dim">Start a process and collect its output in the background.</div>
+      <br>
+      <div><span class="cmd">wink attach</span> <span class="arg">&lt;name&gt; &lt;pid&gt;</span></div>
+      <div class="indent dim">Register an already-running process by PID.</div>
+      <br>
+      <div><span class="cmd">wink ls</span></div>
+      <div class="indent dim">List all services and their current status.</div>
+      <br>
+      <div><span class="cmd">wink logs</span> <span class="arg">[name]</span></div>
+      <div class="indent dim">Print logs, optionally filtered by service name.</div>
+      <br>
+      <div><span class="cmd">wink tail</span> <span class="arg">[name]</span></div>
+      <div class="indent dim">Follow logs in real time without the TUI.</div>
+      <br>
+      <div><span class="cmd">wink stop</span> <span class="arg">&lt;name&gt;</span></div>
+      <div class="indent dim">Send SIGTERM to a watched service.</div>
+      <br>
+      <div><span class="cmd">wink clear</span></div>
+      <div class="indent dim">Remove all logs and state from ~/.wink/.</div>
+    </div>
+  </section>
+
+  <section>
+    <div class="section-title">files</div>
+    <div class="indent">
+      <div><span class="cmd">~/.wink/services.json</span></div>
+      <div class="indent dim">Registered services and their status.</div>
+      <br>
+      <div><span class="cmd">~/.wink/logs.jsonl</span></div>
+      <div class="indent dim">Collected log lines, one JSON object per line.</div>
+    </div>
+  </section>
+
+  <section>
+    <div class="section-title">install</div>
+    <div class="indent dim">
+      curl -Lo wink https://github.com/Malaydewangan09/wink/releases/latest/download/wink-darwin-arm64<br>
+      chmod +x wink &amp;&amp; sudo mv wink /usr/local/bin/
+    </div>
+  </section>
+
+  <section>
+    <div class="section-title">source</div>
+    <div class="indent">
+      <a href="https://github.com/Malaydewangan09/wink">github.com/Malaydewangan09/wink</a>
+    </div>
+  </section>
+
+  <div class="man-footer">
+    <span>wink 0.1.0</span>
+    <span>2026</span>
+    <span>WINK(1)</span>
+  </div>
+
+</body>
+</html>
