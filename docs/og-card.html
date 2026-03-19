@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      width: 1200px;
+      height: 630px;
+      background: #f5f4f0;
+      font-family: 'SF Mono', 'Fira Code', ui-monospace, monospace;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 64px 72px;
+    }
+
+    /* left */
+    .left {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      height: 100%;
+      flex-shrink: 0;
+      width: 380px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: #5eba8a;
+    }
+
+    .brand-name {
+      font-size: 36px;
+      font-weight: 700;
+      color: #111;
+      letter-spacing: -1px;
+    }
+
+    .tagline {
+      font-size: 18px;
+      color: #333;
+      line-height: 1.55;
+      letter-spacing: -0.2px;
+    }
+
+    .meta {
+      font-size: 12px;
+      color: #999;
+    }
+
+    /* terminal */
+    .term {
+      width: 620px;
+      height: 502px;
+      background: #131313;
+      border-radius: 10px;
+      overflow: hidden;
+      box-shadow: 0 4px 40px rgba(0,0,0,0.22), 0 1px 6px rgba(0,0,0,0.12);
+      flex-shrink: 0;
+    }
+
+    .term-bar {
+      background: #1c1c1c;
+      padding: 12px 16px;
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      border-bottom: 1px solid #252525;
+    }
+
+    .tdot { width: 11px; height: 11px; border-radius: 50%; }
+    .tdot.r { background: #ff5f57; }
+    .tdot.y { background: #febc2e; }
+    .tdot.g { background: #28c840; }
+
+    .ttl {
+      flex: 1;
+      text-align: center;
+      font-size: 11px;
+      color: #3a3a3a;
+      margin-right: 33px;
+    }
+
+    .term-body {
+      display: grid;
+      grid-template-columns: 150px 1fr;
+      height: calc(100% - 82px);
+    }
+
+    .t-left {
+      border-right: 1px solid #1e1e1e;
+      padding: 12px 0;
+    }
+
+    .t-lbl {
+      font-size: 9px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: #2e2e2e;
+      padding: 0 12px 10px;
+    }
+
+    .svc {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      padding: 8px 12px;
+      font-size: 11px;
+      border-bottom: 1px solid #191919;
+    }
+
+    .svc.sel { background: rgba(255,255,255,0.025); }
+    .svc .s { font-size: 7px; }
+    .svc .s.on   { color: #5eba8a; }
+    .svc .s.dead { color: #c46a6a; }
+    .svc .n { font-weight: 700; }
+
+    .t-logs { overflow: hidden; }
+
+    .log-hd {
+      font-size: 9px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: #2e2e2e;
+      padding: 12px 14px 7px;
+      border-bottom: 1px solid #1c1c1c;
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .ll {
+      display: grid;
+      grid-template-columns: 72px 54px 1fr;
+      font-size: 11px;
+      line-height: 1;
+      padding: 5.5px 14px;
+    }
+
+    .ll:nth-child(even) { background: rgba(255,255,255,0.012); }
+    .ll-s { font-weight: 700; }
+    .ll-t { color: #2e2e2e; }
+    .ll-m { color: #3c3c3c; }
+    .ll-m.ok   { color: #5eba8a; }
+    .ll-m.err  { color: #c46a6a; }
+    .ll-m.warn { color: #d4a04a; }
+
+    .term-foot {
+      background: #1c1c1c;
+      border-top: 1px solid #252525;
+      padding: 7px 14px;
+      display: flex;
+      justify-content: space-between;
+      font-size: 10px;
+      color: #333;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="left">
+    <div class="brand">
+      <div class="dot"></div>
+      <span class="brand-name">wink</span>
+    </div>
+    <div class="tagline">Watch any local process.<br>All output in one place.</div>
+    <div class="meta">github.com/Malaydewangan09/wink</div>
+  </div>
+
+  <div class="term">
+    <div class="term-bar">
+      <div class="tdot r"></div>
+      <div class="tdot y"></div>
+      <div class="tdot g"></div>
+      <div class="ttl">wink · 4 services · 3 running · 1 dead</div>
+    </div>
+    <div class="term-body">
+      <div class="t-left">
+        <div class="t-lbl">services</div>
+        <div class="svc sel"><span class="s on">●</span><span class="n" style="color:#5eba8a">api</span></div>
+        <div class="svc"><span class="s on">●</span><span class="n" style="color:#d4a04a">worker</span></div>
+        <div class="svc"><span class="s on">●</span><span class="n" style="color:#a87fd4">postgres</span></div>
+        <div class="svc"><span class="s dead">✗</span><span class="n" style="color:#c46a6a">redis</span></div>
+      </div>
+      <div class="t-logs">
+        <div class="log-hd"><span>all services</span><span>↑↓ scroll · q quit</span></div>
+        <div class="ll"><span class="ll-s" style="color:#5eba8a">api</span><span class="ll-t">14:22:01</span><span class="ll-m ok">listening on :3000</span></div>
+        <div class="ll"><span class="ll-s" style="color:#a87fd4">postgres</span><span class="ll-t">14:22:01</span><span class="ll-m">database system ready</span></div>
+        <div class="ll"><span class="ll-s" style="color:#d4a04a">worker</span><span class="ll-t">14:22:02</span><span class="ll-m">connected to postgres</span></div>
+        <div class="ll"><span class="ll-s" style="color:#c46a6a">redis</span><span class="ll-t">14:22:02</span><span class="ll-m err">connection refused :6379</span></div>
+        <div class="ll"><span class="ll-s" style="color:#d4a04a">worker</span><span class="ll-t">14:22:03</span><span class="ll-m warn">WARN redis unavailable</span></div>
+        <div class="ll"><span class="ll-s" style="color:#5eba8a">api</span><span class="ll-t">14:22:05</span><span class="ll-m">GET /users 200  12ms</span></div>
+        <div class="ll"><span class="ll-s" style="color:#d4a04a">worker</span><span class="ll-t">14:22:06</span><span class="ll-m">job queued #4421</span></div>
+        <div class="ll"><span class="ll-s" style="color:#a87fd4">postgres</span><span class="ll-t">14:22:07</span><span class="ll-m">checkpoint complete</span></div>
+        <div class="ll"><span class="ll-s" style="color:#d4a04a">worker</span><span class="ll-t">14:22:08</span><span class="ll-m ok">job #4421 processed</span></div>
+        <div class="ll"><span class="ll-s" style="color:#5eba8a">api</span><span class="ll-t">14:22:09</span><span class="ll-m">POST /jobs 201  8ms</span></div>
+        <div class="ll"><span class="ll-s" style="color:#5eba8a">api</span><span class="ll-t">14:22:14</span><span class="ll-m err">ERROR TypeError at auth.js:42</span></div>
+      </div>
+    </div>
+    <div class="term-foot">
+      <span>[tab] switch pane</span>
+      <span>[a] all services</span>
+    </div>
+  </div>
+
+</body>
+</html>
