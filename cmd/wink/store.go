@@ -2,9 +2,12 @@ package main
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"os"
+	"os/exec"
 	"path/filepath"
+	"sync/atomic"
 	"syscall"
 	"time"
 )
@@ -48,6 +51,25 @@ func logsPath() string {
 
 func ensureDir() error {
 	return os.MkdirAll(winkDir(), 0755)
+}
+
+// statusFromErr determines whether a process exit was intentional or a crash.
+// SIGTERM/SIGINT/SIGKILL = user stopped it = StatusStopped (no notification).
+// Non-zero exit code = unexpected crash = StatusDead (triggers notification).
+func statusFromErr(err error) Status {
+	if err == nil {
+		return StatusStopped
+	}
+	var exitErr *exec.ExitError
+	if errors.As(err, &exitErr) {
+		if status, ok := exitErr.Sys().(syscall.WaitStatus); ok && status.Signaled() {
+			sig := status.Signal()
+			if sig == syscall.SIGTERM || sig == syscall.SIGINT || sig == syscall.SIGKILL {
+				return StatusStopped
+			}
+		}
+	}
+	return StatusDead
 }
 
 // updateService locks services.json, loads it fresh, applies fn, then saves.
@@ -98,6 +120,8 @@ func saveServices(services map[string]*Service) error {
 	return os.WriteFile(servicesPath(), data, 0644)
 }
 
+var appendCounter int64
+
 func appendLog(line LogLine) error {
 	if err := ensureDir(); err != nil {
 		return err
@@ -111,8 +135,37 @@ func appendLog(line LogLine) error {
 	if err != nil {
 		return err
 	}
-	_, err = fmt.Fprintf(f, "%s\n", data)
-	return err
+	if _, err = fmt.Fprintf(f, "%s\n", data); err != nil {
+		return err
+	}
+	// trim every 100 appends to keep logs.jsonl bounded
+	if atomic.AddInt64(&appendCounter, 1)%100 == 0 {
+		_ = trimLogs()
+	}
+	return nil
+}
+
+// trimLogs removes the oldest lines when total exceeds max_log_lines from config.
+func trimLogs() error {
+	cfg, _ := loadConfig()
+	if cfg == nil || cfg.MaxLogLines <= 0 {
+		return nil
+	}
+	lines, err := readLogs("")
+	if err != nil || len(lines) <= cfg.MaxLogLines {
+		return nil
+	}
+	lines = lines[len(lines)-cfg.MaxLogLines:]
+	f, err := os.Create(logsPath())
+	if err != nil {
+		return err
+	}
+	defer f.Close()
+	enc := json.NewEncoder(f)
+	for _, l := range lines {
+		_ = enc.Encode(l)
+	}
+	return nil
 }
 
 func readLogs(filter string) ([]LogLine, error) {
