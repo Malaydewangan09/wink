@@ -100,7 +100,11 @@
     }
 
     .nav-link:hover { color: var(--ink); }
-    .nav-link.active { color: var(--ink); }
+    .nav-link.active {
+      color: var(--ink);
+      border-left: 2px solid var(--ink);
+      padding-left: 18px;
+    }
 
     /* content */
     .content {
@@ -595,5 +599,24 @@ wink attach api 81234</pre>
     <a href="https://github.com/Malaydewangan09/wink">github.com/Malaydewangan09/wink</a>
   </div>
 
+<script>
+  const sections = document.querySelectorAll('.doc-section');
+  const navLinks = document.querySelectorAll('.nav-link');
+
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        navLinks.forEach(link => link.classList.remove('active'));
+        const active = document.querySelector(`.nav-link[href="#${entry.target.id}"]`);
+        if (active) active.classList.add('active');
+      }
+    });
+  }, {
+    rootMargin: '-20% 0px -70% 0px',
+    threshold: 0
+  });
+
+  sections.forEach(section => observer.observe(section));
+</script>
 </body>
 </html>
