@@ -3,6 +3,8 @@ package main
 import (
 	"fmt"
 	"os"
+	"strconv"
+	"strings"
 )
 
 const (
@@ -28,12 +30,23 @@ func main() {
 			os.Exit(1)
 		}
 		restart := false
+		port := 0
 		rest := args[2:]
-		if len(rest) > 0 && rest[0] == "--restart" {
-			restart = true
-			rest = rest[1:]
+		for len(rest) > 0 && strings.HasPrefix(rest[0], "--") {
+			switch rest[0] {
+			case "--restart":
+				restart = true
+				rest = rest[1:]
+			case "--port":
+				if len(rest) > 1 {
+					port, _ = strconv.Atoi(rest[1])
+					rest = rest[2:]
+				}
+			default:
+				rest = rest[1:]
+			}
 		}
-		runCollector(args[1], rest, restart)
+		runCollector(args[1], rest, restart, port)
 		return
 	case "config":
 		if len(args) < 2 {
@@ -74,7 +87,7 @@ func main() {
 		if len(args) < 3 {
 			fatal(fmt.Errorf("usage: wink watch <name> <cmd> [args...]"))
 		}
-		cmdWatch(args[1], args[2:], "", false)
+		cmdWatch(args[1], args[2:], "", false, 0)
 	case "attach":
 		if len(args) < 3 {
 			fatal(fmt.Errorf("usage: wink attach <name> <pid>"))

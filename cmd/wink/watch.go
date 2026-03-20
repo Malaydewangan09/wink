@@ -13,7 +13,8 @@ import (
 	"time"
 )
 
-func cmdWatch(name string, cmdArgs []string, dir string, restart bool) {
+
+func cmdWatch(name string, cmdArgs []string, dir string, restart bool, port int) {
 	services, err := loadServices()
 	if err != nil {
 		fatal(err)
@@ -42,11 +43,14 @@ func cmdWatch(name string, cmdArgs []string, dir string, restart bool) {
 		cwd = dir
 	}
 
-	restartFlag := []string{}
+	var flags []string
 	if restart {
-		restartFlag = []string{"--restart"}
+		flags = append(flags, "--restart")
 	}
-	collectorArgs := append(append([]string{"__collect", name}, restartFlag...), cmdArgs...)
+	if port > 0 {
+		flags = append(flags, "--port", strconv.Itoa(port))
+	}
+	collectorArgs := append(append([]string{"__collect", name}, flags...), cmdArgs...)
 	collector := exec.Command(self, collectorArgs...)
 	collector.Dir = cwd
 	collector.SysProcAttr = &syscall.SysProcAttr{
@@ -90,7 +94,7 @@ func cmdWatch(name string, cmdArgs []string, dir string, restart bool) {
 
 // runCollector is the daemon: starts the actual process, streams its output to the log file.
 // If restart is true, it loops on crash until stopped intentionally.
-func runCollector(name string, cmdArgs []string, restart bool) {
+func runCollector(name string, cmdArgs []string, restart bool, port int) {
 	_ = ensureDir()
 	_ = os.WriteFile(winkDir()+"/collector-err.log",
 		[]byte(fmt.Sprintf("collector started: %s %v\n", name, cmdArgs)), 0644)
@@ -145,6 +149,7 @@ func runCollector(name string, cmdArgs []string, restart bool) {
 				PID:       pid,
 				Status:    StatusRunning,
 				Restart:   restart,
+				Port:      port,
 				StartedAt: startedAt,
 			}
 		})
@@ -221,6 +226,7 @@ func cmdRestart(name string) {
 	savedCmd := svc.Cmd
 	savedDir := svc.Dir
 	savedRestart := svc.Restart
+	savedPort := svc.Port
 
 	// stop if running
 	if svc.Status == StatusRunning {
@@ -252,7 +258,7 @@ func cmdRestart(name string) {
 	}
 
 	fmt.Printf("  %srestarting%s  %s%s%s\n", dim, reset, bold, name, reset)
-	cmdWatch(name, strings.Fields(savedCmd), savedDir, savedRestart)
+	cmdWatch(name, strings.Fields(savedCmd), savedDir, savedRestart, savedPort)
 }
 
 func cmdAttach(name string, pidStr string) {

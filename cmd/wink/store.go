@@ -27,6 +27,7 @@ type Service struct {
 	PID       int       `json:"pid"`
 	Status    Status    `json:"status"`
 	Restart   bool      `json:"restart,omitempty"`
+	Port      int       `json:"port,omitempty"`
 	StartedAt time.Time `json:"started_at"`
 	StoppedAt time.Time `json:"stopped_at,omitempty"`
 }

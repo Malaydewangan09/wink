@@ -232,6 +232,15 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			m.filter = ""
 			m.logOffset = 0
 
+		case "o":
+			if len(m.serviceOrder) > 0 {
+				name := m.serviceOrder[m.selectedSvc]
+				if svc, ok := m.services[name]; ok && svc.Port > 0 {
+					url := fmt.Sprintf("http://localhost:%d", svc.Port)
+					_ = exec.Command("open", url).Start()
+				}
+			}
+
 		case "s":
 			if len(m.serviceOrder) > 0 {
 				name := m.serviceOrder[m.selectedSvc]
@@ -365,13 +374,18 @@ func (m model) renderServices(width, height int) string {
 		dotStr := lipgloss.NewStyle().Foreground(lipgloss.Color(dotCol)).Render(dot)
 		nameStr := lipgloss.NewStyle().Foreground(col).Bold(true).Render(truncate(name, width-6))
 
+		portStr := ""
+		if svc.Port > 0 {
+			portStr = styleDim.Render(fmt.Sprintf(" :%d", svc.Port))
+		}
+
 		var line string
 		if i == m.selectedSvc {
 			accent := lipgloss.NewStyle().Foreground(col).Render("▌")
 			bg := lipgloss.NewStyle().Background(lipgloss.Color("234"))
-			line = bg.Width(width).Render(accent + " " + dotStr + " " + nameStr)
+			line = bg.Width(width).Render(accent + " " + dotStr + " " + nameStr + portStr)
 		} else {
-			line = "   " + dotStr + " " + styleDim.Render(truncate(name, width-6))
+			line = "   " + dotStr + " " + styleDim.Render(truncate(name, width-6)) + portStr
 		}
 
 		rows = append(rows, line)
@@ -506,6 +520,7 @@ func (m model) renderFooter() string {
 		{"a", "all logs"},
 		{"/", "search"},
 		{"t", "timestamps"},
+		{"o", "open"},
 		{"s", "stop"},
 		{"r", "restart"},
 		{"x", "remove"},

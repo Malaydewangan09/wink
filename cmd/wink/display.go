@@ -111,12 +111,17 @@ func cmdList() {
 			uptime = fmt.Sprintf("  %s%s%s", dim, relativeTime(svc.StartedAt), reset)
 		}
 
-		fmt.Printf("  %s%s%s  %s%s%s  %s%s%s  %s%s%s%s\n",
+		portStr := ""
+		if svc.Port > 0 {
+			portStr = fmt.Sprintf("  %s:%d%s", dim, svc.Port, reset)
+		}
+
+		fmt.Printf("  %s%s%s  %s%s%s  %s%s%s  %s%s%s%s%s\n",
 			sc, dot, reset,
 			bold, color+name, reset,
 			dim, svc.Cmd, reset,
 			dim, string(svc.Status), reset,
-			uptime)
+			uptime, portStr)
 	}
 	fmt.Println()
 }
