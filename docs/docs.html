@@ -45,11 +45,9 @@
 
     .brand { display: flex; align-items: center; gap: 10px; text-decoration: none; }
 
-    .brand-dot {
-      width: 7px; height: 7px;
-      border-radius: 50%;
-      background: var(--green);
-      box-shadow: 0 0 5px rgba(52,211,153,0.5);
+    .brand-icon {
+      width: 22px; height: 22px;
+      flex-shrink: 0;
     }
 
     .brand-name {
@@ -313,7 +311,11 @@
 
   <div class="hd">
     <a class="brand" href="index.html">
-      <div class="brand-dot"></div>
+      <svg class="brand-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+        <rect width="32" height="32" rx="6" fill="#0e0e0e"/>
+        <path d="M 5 7 L 11 24 L 16 14 L 21 24 L 27 7" fill="none" stroke="#e8e8e8" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="M 10 8 Q 16 13 22 8" fill="none" stroke="#34d399" stroke-width="2.2" stroke-linecap="round"/>
+      </svg>
       <span class="brand-name">wink</span>
     </a>
     <div class="hd-right">
