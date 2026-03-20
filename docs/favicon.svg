@@ -1,12 +1,12 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
   <title>wink</title>
   <rect width="32" height="32" rx="6" fill="#0e0e0e"/>
-  <!-- bold W letterform -->
-  <path d="M 5 7 L 11 24 L 16 14 L 21 24 L 27 7"
+  <!-- bold W -->
+  <path d="M 5 8 L 11 23 L 16 14 L 21 23 L 27 8"
         fill="none" stroke="#e8e8e8" stroke-width="3"
         stroke-linecap="round" stroke-linejoin="round"/>
-  <!-- green wink arc -->
-  <path d="M 10 8 Q 16 13 22 8"
+  <!-- green wink arc: sits clearly inside the W upper space -->
+  <path d="M 11 11 Q 16 16 21 11"
         fill="none" stroke="#34d399" stroke-width="2.5"
         stroke-linecap="round"/>
 </svg>
