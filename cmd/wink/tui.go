@@ -3,7 +3,9 @@ package main
 import (
 	"fmt"
 	"os"
+	"os/exec"
 	"strings"
+	"syscall"
 	"time"
 
 	tea "github.com/charmbracelet/bubbletea"
@@ -44,6 +46,11 @@ var (
 type tickMsg time.Time
 type logsMsg []LogLine
 type servicesMsg map[string]*Service
+type actionDoneMsg struct {
+	name   string
+	action string
+	err    error
+}
 
 type focusPane int
 
@@ -53,23 +60,30 @@ const (
 )
 
 type model struct {
-	services     map[string]*Service
-	serviceOrder []string
-	logs         []LogLine
-	selectedSvc  int
-	logOffset    int
-	focus        focusPane
-	width        int
-	height       int
-	filter       string
-	showAll      bool
-	ready        bool
+	services      map[string]*Service
+	serviceOrder  []string
+	logs          []LogLine
+	selectedSvc   int
+	logOffset     int
+	focus         focusPane
+	width         int
+	height        int
+	filter        string
+	showAll       bool
+	ready         bool
+	searchMode    bool
+	searchQuery   string
+	confirmRemove  bool
+	statusMsg      string
+	statusClears   int
+	showTimestamps bool
 }
 
 func initialModel() model {
 	return model{
-		services: map[string]*Service{},
-		focus:    paneServices,
+		services:       map[string]*Service{},
+		focus:          paneServices,
+		showTimestamps: true,
 	}
 }
 
@@ -106,7 +120,22 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		m.ready = true
 		return m, nil
 
+	case actionDoneMsg:
+		if msg.err != nil {
+			m.statusMsg = msg.err.Error()
+		} else {
+			m.statusMsg = msg.name + " " + msg.action
+		}
+		m.statusClears = 4
+		return m, nil
+
 	case tickMsg:
+		if m.statusClears > 0 {
+			m.statusClears--
+			if m.statusClears == 0 {
+				m.statusMsg = ""
+			}
+		}
 		return m, tea.Batch(tickCmd(), loadDataCmd(), loadLogsCmd(m.filter))
 
 	case servicesMsg:
@@ -127,16 +156,40 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		return m, nil
 
 	case tea.MouseMsg:
-		if m.focus == paneLogs || true {
-			switch msg.Button {
-			case tea.MouseButtonWheelUp:
-				m.logOffset = min(m.logOffset+3, m.maxLogOffset())
-			case tea.MouseButtonWheelDown:
-				m.logOffset = max(m.logOffset-3, 0)
-			}
+		switch msg.Button {
+		case tea.MouseButtonWheelUp:
+			m.logOffset = min(m.logOffset+3, m.maxLogOffset())
+		case tea.MouseButtonWheelDown:
+			m.logOffset = max(m.logOffset-3, 0)
 		}
 
 	case tea.KeyMsg:
+		// search mode intercepts all keys
+		if m.searchMode {
+			switch msg.String() {
+			case "ctrl+c":
+				return m, tea.Quit
+			case "esc":
+				m.searchMode = false
+				m.searchQuery = ""
+				m.logOffset = 0
+			case "enter":
+				m.searchMode = false
+				m.logOffset = 0
+			case "backspace", "ctrl+h":
+				if len(m.searchQuery) > 0 {
+					m.searchQuery = m.searchQuery[:len(m.searchQuery)-1]
+					m.logOffset = 0
+				}
+			default:
+				if len(msg.String()) == 1 {
+					m.searchQuery += msg.String()
+					m.logOffset = 0
+				}
+			}
+			return m, nil
+		}
+
 		switch msg.String() {
 		case "q", "ctrl+c":
 			return m, tea.Quit
@@ -180,13 +233,34 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			m.logOffset = 0
 
 		case "s":
-			if m.focus == paneServices && len(m.serviceOrder) > 0 {
+			if len(m.serviceOrder) > 0 {
 				name := m.serviceOrder[m.selectedSvc]
 				if svc, ok := m.services[name]; ok && svc.Status == StatusRunning {
 					proc, err := os.FindProcess(svc.PID)
 					if err == nil {
-						_ = proc.Signal(os.Interrupt)
+						_ = proc.Signal(syscall.SIGTERM)
 					}
+				}
+			}
+
+		case "r":
+			if len(m.serviceOrder) > 0 {
+				name := m.serviceOrder[m.selectedSvc]
+				m.confirmRemove = false
+				return m, tuiRestartCmd(name)
+			}
+
+		case "x":
+			if len(m.serviceOrder) > 0 {
+				name := m.serviceOrder[m.selectedSvc]
+				if svc, ok := m.services[name]; ok && svc.Status == StatusRunning {
+					m.statusMsg = name + " is running, stop first"
+					m.statusClears = 4
+				} else if m.confirmRemove {
+					m.confirmRemove = false
+					return m, tuiRemoveCmd(name)
+				} else {
+					m.confirmRemove = true
 				}
 			}
 
@@ -196,6 +270,22 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		case "g":
 			// jump to top
 			m.logOffset = m.maxLogOffset()
+
+		case "t":
+			m.showTimestamps = !m.showTimestamps
+
+		case "/":
+			m.searchMode = true
+			m.searchQuery = ""
+			m.logOffset = 0
+
+		case "esc":
+			if m.confirmRemove {
+				m.confirmRemove = false
+			} else if m.searchQuery != "" {
+				m.searchQuery = ""
+				m.logOffset = 0
+			}
 		}
 	}
 
@@ -300,9 +390,12 @@ func (m model) renderServices(width, height int) string {
 
 func (m model) renderLogs(width, height int) string {
 	var filtered []LogLine
+	sq := strings.ToLower(m.searchQuery)
 	for _, l := range m.logs {
 		if m.filter == "" || l.Service == m.filter {
-			filtered = append(filtered, l)
+			if sq == "" || strings.Contains(strings.ToLower(l.Text), sq) {
+				filtered = append(filtered, l)
+			}
 		}
 	}
 
@@ -311,6 +404,9 @@ func (m model) renderLogs(width, height int) string {
 		label = styleFaint.Render("  LOGS") + "  " + styleDim.Render("all")
 	} else if m.filter != "" {
 		label = styleFaint.Render("  LOGS") + "  " + styleDim.Render(m.filter)
+	}
+	if m.searchQuery != "" {
+		label += "  " + lipgloss.NewStyle().Foreground(lipgloss.Color("72")).Render("/"+m.searchQuery)
 	}
 
 	headerRow := []string{label}
@@ -345,9 +441,14 @@ func (m model) renderLogs(width, height int) string {
 			Width(10).
 			Render(truncate(l.Service, 10))
 
-		ts := styleTs.Render(l.Timestamp.Format("15:04:05"))
+		tsWidth := 0
+		tsStr := ""
+		if m.showTimestamps {
+			tsWidth = 10
+			tsStr = styleTs.Render(l.Timestamp.Format("15:04:05"))
+		}
 
-		msgWidth := width - 10 - 10 - 4
+		msgWidth := width - 10 - tsWidth - 4
 		if msgWidth < 10 {
 			msgWidth = 10
 		}
@@ -360,7 +461,11 @@ func (m model) renderLogs(width, height int) string {
 			msg = colorizeLog(text)
 		}
 
-		rows = append(rows, fmt.Sprintf("  %s  %s  %s", svcLabel, ts, msg))
+		if m.showTimestamps {
+			rows = append(rows, fmt.Sprintf("  %s  %s  %s", svcLabel, tsStr, msg))
+		} else {
+			rows = append(rows, fmt.Sprintf("  %s  %s", svcLabel, msg))
+		}
 	}
 
 	if len(filtered) == 0 {
@@ -376,11 +481,34 @@ func (m model) renderLogs(width, height int) string {
 }
 
 func (m model) renderFooter() string {
+	if m.searchMode {
+		prompt := lipgloss.NewStyle().Foreground(lipgloss.Color("72")).Render("/")
+		cursor := lipgloss.NewStyle().Foreground(lipgloss.Color("245")).Render("▌")
+		hint := styleDim.Render("  enter: apply  esc: cancel")
+		content := "  " + prompt + " " + m.searchQuery + cursor + hint
+		return styleFooter.Width(m.width).Render(content)
+	}
+
+	if m.confirmRemove {
+		warn := lipgloss.NewStyle().Foreground(lipgloss.Color("167")).Render("x again to confirm remove")
+		esc := styleDim.Render("  esc: cancel")
+		return styleFooter.Width(m.width).Render("  " + warn + esc)
+	}
+
+	if m.statusMsg != "" {
+		msg := lipgloss.NewStyle().Foreground(lipgloss.Color("245")).Render(m.statusMsg)
+		return styleFooter.Width(m.width).Render("  " + msg)
+	}
+
 	keys := []struct{ key, desc string }{
 		{"tab", "switch"},
 		{"↑↓", "navigate"},
 		{"a", "all logs"},
+		{"/", "search"},
+		{"t", "timestamps"},
 		{"s", "stop"},
+		{"r", "restart"},
+		{"x", "remove"},
 		{"q", "quit"},
 	}
 
@@ -485,25 +613,15 @@ func stripAnsi(s string) string {
 	return string(out)
 }
 
-func max(a, b int) int {
-	if a > b {
-		return a
-	}
-	return b
-}
-
-func min(a, b int) int {
-	if a < b {
-		return a
-	}
-	return b
-}
 
 func (m model) maxLogOffset() int {
 	var filtered []LogLine
+	sq := strings.ToLower(m.searchQuery)
 	for _, l := range m.logs {
 		if m.filter == "" || l.Service == m.filter {
-			filtered = append(filtered, l)
+			if sq == "" || strings.Contains(strings.ToLower(l.Text), sq) {
+				filtered = append(filtered, l)
+			}
 		}
 	}
 	visibleCount := m.height - 3 // header + footer + label row
@@ -512,6 +630,34 @@ func (m model) maxLogOffset() int {
 		return 0
 	}
 	return max
+}
+
+func tuiRestartCmd(name string) tea.Cmd {
+	return func() tea.Msg {
+		self, err := os.Executable()
+		if err != nil {
+			return actionDoneMsg{name: name, action: "restart", err: err}
+		}
+		err = exec.Command(self, "restart", name).Run()
+		if err != nil {
+			return actionDoneMsg{name: name, action: "restart", err: err}
+		}
+		return actionDoneMsg{name: name, action: "restarted"}
+	}
+}
+
+func tuiRemoveCmd(name string) tea.Cmd {
+	return func() tea.Msg {
+		self, err := os.Executable()
+		if err != nil {
+			return actionDoneMsg{name: name, action: "remove", err: err}
+		}
+		err = exec.Command(self, "rm", name).Run()
+		if err != nil {
+			return actionDoneMsg{name: name, action: "remove", err: err}
+		}
+		return actionDoneMsg{name: name, action: "removed"}
+	}
 }
 
 func cmdTUI() {

@@ -329,7 +329,7 @@
       <span class="brand-name">wink</span>
     </div>
     <div class="hd-right">
-      <span>v0.2.0</span>
+      <span>v0.3.0</span>
       <a href="https://github.com/Malaydewangan09/wink">github</a>
       <a href="https://github.com/Malaydewangan09/wink/releases">download</a>
     </div>
@@ -337,7 +337,7 @@
 
   <div class="tagline">
     <div class="main">All your service logs in one place.</div>
-    <div class="sub">Watch any process · stdout and stderr · aggregated · live · single binary</div>
+    <div class="sub">Watch any process · stdout and stderr · search · crash alerts · single binary</div>
   </div>
 
   <div class="term">
@@ -374,8 +374,8 @@
       </div>
     </div>
     <div class="term-foot">
-      <span>[tab] switch pane</span>
-      <span>[a] all services</span>
+      <span>[/] search · [t] timestamps · [a] all</span>
+      <span>[s] stop · [r] restart · [x] remove · [q] quit</span>
     </div>
   </div>
 
@@ -383,13 +383,16 @@
     <div class="bg-panel">
       <div class="panel-title">commands</div>
       <div class="cmd-list">
+        <div class="cmd-row"><code>wink up [wink.yaml]</code><span class="leader"></span><span class="desc">start all from config</span></div>
+        <div class="cmd-row"><code>wink down [wink.yaml]</code><span class="leader"></span><span class="desc">stop all from config</span></div>
         <div class="cmd-row"><code>wink watch &lt;name&gt; &lt;cmd&gt;</code><span class="leader"></span><span class="desc">start a process</span></div>
-        <div class="cmd-row"><code>wink attach &lt;name&gt; &lt;pid&gt;</code><span class="leader"></span><span class="desc">register by pid</span></div>
+        <div class="cmd-row"><code>wink restart &lt;name&gt;</code><span class="leader"></span><span class="desc">restart a service</span></div>
+        <div class="cmd-row"><code>wink stop &lt;name&gt;</code><span class="leader"></span><span class="desc">send sigterm</span></div>
+        <div class="cmd-row"><code>wink rm &lt;name&gt;</code><span class="leader"></span><span class="desc">remove service + logs</span></div>
         <div class="cmd-row"><code>wink ls</code><span class="leader"></span><span class="desc">list services</span></div>
         <div class="cmd-row"><code>wink logs [name]</code><span class="leader"></span><span class="desc">print logs</span></div>
         <div class="cmd-row"><code>wink tail [name]</code><span class="leader"></span><span class="desc">follow live</span></div>
-        <div class="cmd-row"><code>wink stop &lt;name&gt;</code><span class="leader"></span><span class="desc">send sigterm</span></div>
-        <div class="cmd-row"><code>wink clear</code><span class="leader"></span><span class="desc">reset state</span></div>
+        <div class="cmd-row"><code>wink config edit</code><span class="leader"></span><span class="desc">edit settings</span></div>
       </div>
     </div>
     <div class="bg-panel">
@@ -419,7 +422,7 @@ chmod +x wink &amp;&amp; sudo mv wink /usr/local/bin/</code>
   </div>
 
   <div class="foot">
-    <span>wink v0.2.0 · mit · go</span>
+    <span>wink v0.3.0 · mit · go</span>
     <a href="https://github.com/Malaydewangan09/wink">github.com/Malaydewangan09/wink</a>
   </div>
 

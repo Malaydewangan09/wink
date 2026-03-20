@@ -1,3 +1,4 @@
 /wink
 dist/
 *.log
+.idea/

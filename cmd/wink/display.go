@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
-	"strings"
 	"time"
 )
 
@@ -289,19 +288,3 @@ func cmdClear() {
 	fmt.Printf("  %scleared%s\n", dim, reset)
 }
 
-func maxLabelWidth(services map[string]*Service) int {
-	max := 0
-	for name := range services {
-		if len(name) > max {
-			max = len(name)
-		}
-	}
-	return max
-}
-
-func padRight(s string, n int) string {
-	if len(s) >= n {
-		return s
-	}
-	return s + strings.Repeat(" ", n-len(s))
-}

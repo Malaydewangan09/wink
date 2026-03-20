@@ -163,16 +163,16 @@ func runCollector(name string, cmdArgs []string) {
 
 	err = cmd.Wait()
 	stoppedAt := time.Now()
-	finalStatus := StatusStopped
-	if err != nil {
-		finalStatus = StatusDead
-	}
+	finalStatus := statusFromErr(err)
 	_ = updateService(name, func(services map[string]*Service) {
 		if svc, ok := services[name]; ok {
 			svc.Status = finalStatus
 			svc.StoppedAt = stoppedAt
 		}
 	})
+	if finalStatus == StatusDead {
+		notifyCrash(name)
+	}
 }
 
 func cmdRestart(name string) {

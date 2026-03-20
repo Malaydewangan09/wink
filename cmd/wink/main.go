@@ -5,7 +5,13 @@ import (
 	"os"
 )
 
-const version = "0.2.0"
+const (
+	version = "0.3.0"
+	appName = "wink"
+
+	notifySound   = "Basso"
+	notifyCrashFmt = "%s crashed"
+)
 
 func main() {
 	args := os.Args[1:]
@@ -23,6 +29,41 @@ func main() {
 		}
 		runCollector(args[1], args[2:])
 		return
+	case "config":
+		if len(args) < 2 {
+			cmdConfigShow()
+			break
+		}
+		switch args[1] {
+		case "set":
+			if len(args) < 4 {
+				fatal(fmt.Errorf("usage: wink config set <key> <value>"))
+			}
+			cmdConfigSet(args[2], args[3])
+		case "unset":
+			if len(args) < 3 {
+				fatal(fmt.Errorf("usage: wink config unset <key>"))
+			}
+			cmdConfigUnset(args[2])
+		case "show":
+			cmdConfigShow()
+		case "edit":
+			cmdConfigEdit()
+		default:
+			fatal(fmt.Errorf("unknown config subcommand %q", args[1]))
+		}
+	case "up":
+		configPath := "wink.yaml"
+		if len(args) > 1 {
+			configPath = args[1]
+		}
+		cmdUp(configPath)
+	case "down":
+		configPath := "wink.yaml"
+		if len(args) > 1 {
+			configPath = args[1]
+		}
+		cmdDown(configPath)
 	case "watch":
 		if len(args) < 3 {
 			fatal(fmt.Errorf("usage: wink watch <name> <cmd> [args...]"))
@@ -83,7 +124,14 @@ func fatal(err error) {
 
 func printHelp() {
 	fmt.Printf("\n  %s%swink%s  %slog aggregator for local services%s  %sv%s%s\n\n", bold, white, reset, dim, reset, dim, version, reset)
-	fmt.Printf("  %sWATCH%s\n", bold, reset)
+	fmt.Printf("  %sCONFIG%s\n", bold, reset)
+	fmt.Printf("  wink %sconfig show%s              show current config\n", cyan, reset)
+	fmt.Printf("  wink %sconfig edit%s              open config in $EDITOR\n", cyan, reset)
+	fmt.Printf("  wink %sconfig set%s <key> <val>  set a config value\n", cyan, reset)
+	fmt.Printf("  wink %sconfig unset%s <key>       reset a config value to default\n", cyan, reset)
+	fmt.Printf("  wink %sup%s [wink.yaml]           start all services from config file\n", cyan, reset)
+	fmt.Printf("  wink %sdown%s [wink.yaml]          stop all services from config file\n", cyan, reset)
+	fmt.Printf("\n  %sWATCH%s\n", bold, reset)
 	fmt.Printf("  wink %swatch%s <name> <cmd>    start a process and collect its output\n", cyan, reset)
 	fmt.Printf("  wink %sattach%s <name> <pid>   attach to an already-running process\n", cyan, reset)
 	fmt.Printf("  wink %sstop%s <name>            stop watching a service\n", cyan, reset)
@@ -94,5 +142,8 @@ func printHelp() {
 	fmt.Printf("  wink %slogs%s [name]            show logs, optionally filter by service\n", dim, reset)
 	fmt.Printf("  wink %stail%s [name]            follow logs in real time\n", dim, reset)
 	fmt.Printf("  wink %sclear%s                  clear all logs and sessions\n", dim, reset)
+	fmt.Printf("\n  %sTUI%s\n", bold, reset)
+	fmt.Printf("  %s/  search logs%s  ·  %sa  all logs%s  ·  %ss  stop service%s  ·  %sq  quit%s\n",
+		dim, reset, dim, reset, dim, reset, dim, reset)
 	fmt.Printf("\n")
 }
