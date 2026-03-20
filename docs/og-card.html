@@ -3,216 +3,261 @@
 <head>
   <meta charset="UTF-8" />
   <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap');
+
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     body {
       width: 1200px;
-      height: 800px;
-      background: #f5f4f0;
-      font-family: 'SF Mono', 'Fira Code', ui-monospace, monospace;
+      height: 630px;
+      background: #f0eeea;
       overflow: hidden;
+      font-family: 'Inter', sans-serif;
       display: flex;
       align-items: center;
-      justify-content: space-between;
-      padding: 80px 72px;
+      padding: 0 80px;
+      gap: 80px;
     }
 
-    /* left */
+    /* ── left column ── */
     .left {
+      flex: 0 0 360px;
       display: flex;
       flex-direction: column;
-      justify-content: space-between;
-      height: 100%;
-      flex-shrink: 0;
-      width: 380px;
     }
 
-    .brand {
+    .label {
+      font-size: 11px;
+      font-weight: 500;
+      letter-spacing: 2px;
+      color: #999;
+      text-transform: uppercase;
+      margin-bottom: 18px;
+    }
+
+    .name {
+      font-size: 72px;
+      font-weight: 800;
+      color: #0e0e0e;
+      letter-spacing: -3px;
+      line-height: 1;
+      margin-bottom: 24px;
+    }
+
+    .desc {
+      font-size: 15px;
+      line-height: 1.7;
+      color: #666;
+      font-weight: 400;
+      margin-bottom: 28px;
+    }
+
+    .badges {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 32px;
+    }
+
+    .badge {
+      font-size: 12px;
+      color: #888;
+      border: 1px solid #ddd;
+      background: #fff;
+      padding: 4px 12px;
+      border-radius: 4px;
+      font-weight: 500;
+    }
+
+    .gh {
+      font-size: 14px;
+      font-weight: 700;
+      color: #0e0e0e;
       display: flex;
       align-items: center;
-      gap: 12px;
+      gap: 5px;
     }
 
-    .brand-icon {
-      width: 36px;
-      height: 36px;
-    }
+    .gh .arrow { color: #aaa; font-size: 16px; }
 
-    .brand-name {
-      font-size: 36px;
-      font-weight: 700;
-      color: #111;
-      letter-spacing: -1px;
-    }
+    .brand-icon { display: flex; align-items: center; gap: 12px; margin-bottom: 20px; }
+    .brand-icon svg { width: 36px; height: 36px; }
 
-    .tagline {
-      font-size: 18px;
-      color: #333;
-      line-height: 1.55;
-      letter-spacing: -0.2px;
-    }
-
-    .meta {
-      font-size: 12px;
-      color: #999;
-    }
-
-    /* terminal */
-    .term {
-      width: 620px;
-      height: 640px;
-      background: #131313;
-      border-radius: 10px;
+    /* ── right: mock window ── */
+    .window {
+      flex: 1;
+      height: 480px;
+      background: #fff;
+      border-radius: 16px;
+      border: 1px solid #e0ddd8;
+      box-shadow: 0 4px 40px rgba(0,0,0,0.08);
       overflow: hidden;
-      box-shadow: 0 4px 40px rgba(0,0,0,0.22), 0 1px 6px rgba(0,0,0,0.12);
-      flex-shrink: 0;
+      display: flex;
+      flex-direction: column;
     }
 
-    .term-bar {
-      background: #1c1c1c;
-      padding: 12px 16px;
+    .win-bar {
+      background: #f7f6f3;
+      padding: 14px 20px;
       display: flex;
       align-items: center;
       gap: 7px;
-      border-bottom: 1px solid #252525;
+      border-bottom: 1px solid #ebe9e4;
+      flex-shrink: 0;
     }
 
-    .tdot { width: 11px; height: 11px; border-radius: 50%; }
-    .tdot.r { background: #ff5f57; }
-    .tdot.y { background: #febc2e; }
-    .tdot.g { background: #28c840; }
+    .dot { width: 11px; height: 11px; border-radius: 50%; }
+    .dot-r { background: #f87171; }
+    .dot-y { background: #fbbf24; }
+    .dot-g { background: #34d399; }
 
-    .ttl {
+    .win-body {
       flex: 1;
-      text-align: center;
-      font-size: 11px;
-      color: #3a3a3a;
-      margin-right: 33px;
+      display: flex;
+      overflow: hidden;
     }
 
-    .term-body {
-      display: grid;
-      grid-template-columns: 150px 1fr;
-      height: calc(100% - 82px);
-    }
-
-    .t-left {
-      border-right: 1px solid #1e1e1e;
-      padding: 12px 0;
-    }
-
-    .t-lbl {
-      font-size: 9px;
-      letter-spacing: 2px;
-      text-transform: uppercase;
-      color: #2e2e2e;
-      padding: 0 12px 10px;
+    /* service sidebar — light */
+    .sidebar {
+      width: 165px;
+      background: #fafaf8;
+      padding: 20px 0;
+      border-right: 1px solid #ebe9e4;
+      flex-shrink: 0;
+      display: flex;
+      flex-direction: column;
     }
 
     .svc {
       display: flex;
       align-items: center;
-      gap: 7px;
-      padding: 8px 12px;
+      gap: 8px;
+      padding: 7px 18px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px;
+      font-weight: 500;
+      color: #bbb;
+    }
+
+    .svc.active { color: #222; }
+
+    .svc-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+
+    .sidebar-foot {
+      margin-top: auto;
+      padding: 14px 18px 8px;
+      font-family: 'Inter', sans-serif;
       font-size: 11px;
-      border-bottom: 1px solid #191919;
+      color: #bbb;
+      line-height: 1.6;
     }
 
-    .svc.sel { background: rgba(255,255,255,0.025); }
-    .svc .s { font-size: 7px; }
-    .svc .s.on   { color: #5eba8a; }
-    .svc .s.dead { color: #c46a6a; }
-    .svc .n { font-weight: 700; }
-
-    .t-logs { overflow: hidden; }
-
-    .log-hd {
-      font-size: 9px;
-      letter-spacing: 2px;
-      text-transform: uppercase;
-      color: #2e2e2e;
-      padding: 12px 14px 7px;
-      border-bottom: 1px solid #1c1c1c;
-      display: flex;
-      justify-content: space-between;
-    }
-
-    .ll {
-      display: grid;
-      grid-template-columns: 72px 54px 1fr;
-      font-size: 11px;
-      line-height: 1;
-      padding: 5.5px 14px;
-    }
-
-    .ll:nth-child(even) { background: rgba(255,255,255,0.012); }
-    .ll-s { font-weight: 700; }
-    .ll-t { color: #2e2e2e; }
-    .ll-m { color: #3c3c3c; }
-    .ll-m.ok   { color: #5eba8a; }
-    .ll-m.err  { color: #c46a6a; }
-    .ll-m.warn { color: #d4a04a; }
-
-    .term-foot {
-      background: #1c1c1c;
-      border-top: 1px solid #252525;
-      padding: 7px 14px;
-      display: flex;
-      justify-content: space-between;
+    .win-foot {
+      background: #fafaf8;
+      border-top: 1px solid #ebe9e4;
+      padding: 10px 18px;
+      font-family: 'JetBrains Mono', monospace;
       font-size: 10px;
-      color: #333;
+      color: #ccc;
+      flex-shrink: 0;
     }
+
+    /* log terminal — dark */
+    .logs {
+      flex: 1;
+      background: #111;
+      padding: 18px 22px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      line-height: 1.9;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .log { display: flex; gap: 12px; white-space: nowrap; }
+
+    .svc-tag {
+      font-weight: 500;
+      width: 72px;
+      flex-shrink: 0;
+      text-align: right;
+    }
+
+    .log-text      { color: #333; }
+    .log-text.hi   { color: #555; }
+    .log-text.err  { color: #7a2a2a; }
+    .log-text.warn { color: #6a5410; }
+
+    .c-api      { color: #34d399; }
+    .c-postgres { color: #d4a04a; }
+    .c-worker   { color: #818cf8; }
+    .c-redis    { color: #f87171; }
   </style>
 </head>
 <body>
 
   <div class="left">
-    <div class="brand">
-      <svg class="brand-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
-        <rect width="32" height="32" rx="6" fill="#0e0e0e"/>
-        <path d="M 5 7 L 11 24 L 16 14 L 21 24 L 27 7" fill="none" stroke="#e8e8e8" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
-        <path d="M 10 8 Q 16 13 22 8" fill="none" stroke="#34d399" stroke-width="2.2" stroke-linecap="round"/>
+    <div class="brand-icon">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+        <rect width="32" height="32" rx="8" fill="#0e0e0e"/>
+        <circle cx="16" cy="9" r="2.5" fill="#e8e8e8"/>
+        <path d="M 7 19 Q 16 26 25 19" fill="none" stroke="#34d399" stroke-width="3.5" stroke-linecap="round"/>
       </svg>
-      <span class="brand-name">wink</span>
     </div>
-    <div class="tagline">Scattered terminals, missed crashes,<br>logs everywhere. wink puts it all<br>in one place.</div>
-    <div class="meta">github.com/Malaydewangan09/wink</div>
+    <div class="label">local dev tool</div>
+    <div class="name">wink</div>
+    <div class="desc">
+      Watches named local processes and streams all stdout and
+      stderr into one terminal. Services on the left, logs on the right.
+    </div>
+    <div class="badges">
+      <span class="badge">Go</span>
+      <span class="badge">CLI</span>
+      <span class="badge">single binary</span>
+    </div>
+    <div class="gh">GitHub <span class="arrow">↗</span></div>
   </div>
 
-  <div class="term">
-    <div class="term-bar">
-      <div class="tdot r"></div>
-      <div class="tdot y"></div>
-      <div class="tdot g"></div>
-      <div class="ttl">wink · 4 services · 3 running · 1 dead</div>
+  <div class="window">
+    <div class="win-bar">
+      <div class="dot dot-r"></div>
+      <div class="dot dot-y"></div>
+      <div class="dot dot-g"></div>
     </div>
-    <div class="term-body">
-      <div class="t-left">
-        <div class="t-lbl">services</div>
-        <div class="svc sel"><span class="s on">●</span><span class="n" style="color:#5eba8a">api</span><span style="color:#2a2a2a;margin-left:auto;font-size:9px">:3000</span></div>
-        <div class="svc"><span class="s on">●</span><span class="n" style="color:#d4a04a">worker</span></div>
-        <div class="svc"><span class="s on">●</span><span class="n" style="color:#a87fd4">postgres</span><span style="color:#2a2a2a;margin-left:auto;font-size:9px">:5432</span></div>
-        <div class="svc"><span class="s dead">✗</span><span class="n" style="color:#c46a6a">redis</span><span style="color:#2a2a2a;margin-left:auto;font-size:9px">:6379</span></div>
+
+    <div class="win-body">
+      <div class="sidebar">
+        <div class="svc active"><div class="svc-dot" style="background:#34d399"></div>api</div>
+        <div class="svc active"><div class="svc-dot" style="background:#d4a04a"></div>postgres</div>
+        <div class="svc active"><div class="svc-dot" style="background:#818cf8"></div>worker</div>
+        <div class="svc active"><div class="svc-dot" style="background:#f87171"></div>redis</div>
+        <div class="sidebar-foot">Watch any local process.<br>All output in one place.</div>
       </div>
-      <div class="t-logs">
-        <div class="log-hd"><span>all services</span><span>↑↓ scroll · q quit</span></div>
-        <div class="ll"><span class="ll-s" style="color:#5eba8a">api</span><span class="ll-t">14:22:01</span><span class="ll-m ok">listening on :3000</span></div>
-        <div class="ll"><span class="ll-s" style="color:#a87fd4">postgres</span><span class="ll-t">14:22:01</span><span class="ll-m">database system ready</span></div>
-        <div class="ll"><span class="ll-s" style="color:#d4a04a">worker</span><span class="ll-t">14:22:02</span><span class="ll-m">connected to postgres</span></div>
-        <div class="ll"><span class="ll-s" style="color:#c46a6a">redis</span><span class="ll-t">14:22:02</span><span class="ll-m err">connection refused :6379</span></div>
-        <div class="ll"><span class="ll-s" style="color:#d4a04a">worker</span><span class="ll-t">14:22:03</span><span class="ll-m warn">WARN redis unavailable</span></div>
-        <div class="ll"><span class="ll-s" style="color:#5eba8a">api</span><span class="ll-t">14:22:05</span><span class="ll-m">GET /users 200  12ms</span></div>
-        <div class="ll"><span class="ll-s" style="color:#d4a04a">worker</span><span class="ll-t">14:22:06</span><span class="ll-m">job queued #4421</span></div>
-        <div class="ll"><span class="ll-s" style="color:#a87fd4">postgres</span><span class="ll-t">14:22:07</span><span class="ll-m">checkpoint complete</span></div>
-        <div class="ll"><span class="ll-s" style="color:#d4a04a">worker</span><span class="ll-t">14:22:08</span><span class="ll-m ok">job #4421 processed</span></div>
-        <div class="ll"><span class="ll-s" style="color:#5eba8a">api</span><span class="ll-t">14:22:09</span><span class="ll-m">POST /jobs 201  8ms</span></div>
-        <div class="ll"><span class="ll-s" style="color:#5eba8a">api</span><span class="ll-t">14:22:14</span><span class="ll-m err">ERROR TypeError at auth.js:42</span></div>
+
+      <div class="logs">
+        <div class="log"><span class="svc-tag c-api">api</span><span class="log-text hi">listening on :3000</span></div>
+        <div class="log"><span class="svc-tag c-postgres">postgres</span><span class="log-text hi">database system ready</span></div>
+        <div class="log"><span class="svc-tag c-worker">worker</span><span class="log-text">queue connected, awaiting jobs</span></div>
+        <div class="log"><span class="svc-tag c-redis">redis</span><span class="log-text">connection refused :6379</span></div>
+        <div class="log"><span class="svc-tag c-worker">worker</span><span class="log-text warn">WARN redis unavailable</span></div>
+        <div class="log"><span class="svc-tag c-api">api</span><span class="log-text">GET /health 200 1ms</span></div>
+        <div class="log"><span class="svc-tag c-worker">worker</span><span class="log-text">job #4421 processed 210ms</span></div>
+        <div class="log"><span class="svc-tag c-postgres">postgres</span><span class="log-text">checkpoint complete</span></div>
+        <div class="log"><span class="svc-tag c-worker">worker</span><span class="log-text">job #4422 processed 88ms</span></div>
+        <div class="log"><span class="svc-tag c-api">api</span><span class="log-text">POST /api/login 200 42ms</span></div>
+        <div class="log"><span class="svc-tag c-api">api</span><span class="log-text err">ERROR TypeError at auth.js:42</span></div>
+        <div class="log"><span class="svc-tag c-postgres">postgres</span><span class="log-text">autovacuum: users 0.3ms</span></div>
+        <div class="log"><span class="svc-tag c-worker">worker</span><span class="log-text">poll: 0 jobs</span></div>
+        <div class="log"><span class="svc-tag c-api">api</span><span class="log-text">GET /feed 200 8ms</span></div>
       </div>
     </div>
-    <div class="term-foot">
-      <span>[/] search  [o] open  [s] stop  [r] restart</span>
-      <span>[q] quit</span>
-    </div>
+
+    <div class="win-foot">github.com/Malaydewangan09/wink</div>
   </div>
 
 </body>
