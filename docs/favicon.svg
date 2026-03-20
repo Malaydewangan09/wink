@@ -1,11 +1,10 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
   <title>wink</title>
-  <rect width="32" height="32" rx="6" fill="#0e0e0e"/>
-  <!-- eye outline: almond shape -->
-  <path d="M 4 16 Q 16 7 28 16 Q 16 25 4 16 Z"
-        fill="none" stroke="#e8e8e8" stroke-width="1.8"/>
-  <!-- green iris -->
-  <circle cx="16" cy="16" r="4.5" fill="#34d399"/>
-  <!-- dark pupil -->
-  <circle cx="16" cy="16" r="2" fill="#0e0e0e"/>
+  <rect width="32" height="32" rx="8" fill="#0e0e0e"/>
+  <!-- the dot from ;) -->
+  <circle cx="16" cy="10" r="2.5" fill="#34d399"/>
+  <!-- the wink curve -->
+  <path d="M 7 19 Q 16 26 25 19"
+        fill="none" stroke="#e8e8e8" stroke-width="3"
+        stroke-linecap="round"/>
 </svg>
