@@ -6,30 +6,75 @@ import (
 	"strings"
 )
 
-// parseWinkFile reads a wink.yaml file.
-// Format: one service per line — name: command
-// Lines starting with # are comments.
-func parseWinkFile(path string) (map[string]string, error) {
+// ServiceDef holds a service definition parsed from wink.yaml.
+type ServiceDef struct {
+	Cmd string
+	Dir string
+}
+
+// parseWinkFile supports two formats:
+//
+// Simple (runs from wink up cwd):
+//
+//	api: node server.js
+//
+// Extended (explicit working dir):
+//
+//	api:
+//	  cmd: node server.js
+//	  dir: ./apps/api
+func parseWinkFile(path string) (map[string]ServiceDef, error) {
 	data, err := os.ReadFile(path)
 	if err != nil {
 		return nil, err
 	}
-	services := map[string]string{}
+
+	services := map[string]ServiceDef{}
+	var currentBlock string
+
 	for _, line := range strings.Split(string(data), "\n") {
-		line = strings.TrimSpace(line)
-		if line == "" || strings.HasPrefix(line, "#") {
+		isIndented := len(line) > 0 && (line[0] == ' ' || line[0] == '\t')
+		trimmed := strings.TrimSpace(line)
+
+		if trimmed == "" || strings.HasPrefix(trimmed, "#") {
 			continue
 		}
-		name, cmd, ok := strings.Cut(line, ":")
+
+		key, val, ok := strings.Cut(trimmed, ":")
 		if !ok {
 			continue
 		}
-		name = strings.TrimSpace(name)
-		cmd = strings.TrimSpace(cmd)
-		if name != "" && cmd != "" {
-			services[name] = cmd
+		key = strings.TrimSpace(key)
+		val = strings.TrimSpace(val)
+
+		if isIndented && currentBlock != "" {
+			// property of current block
+			def := services[currentBlock]
+			switch key {
+			case "cmd":
+				def.Cmd = val
+			case "dir":
+				def.Dir = val
+			}
+			services[currentBlock] = def
+		} else if val == "" {
+			// block header: api:
+			currentBlock = key
+			services[key] = ServiceDef{}
+		} else {
+			// simple format: api: node server.js
+			currentBlock = ""
+			services[key] = ServiceDef{Cmd: val}
 		}
 	}
+
+	// remove blocks with no cmd
+	for name, def := range services {
+		if def.Cmd == "" {
+			delete(services, name)
+		}
+	}
+
 	if len(services) == 0 {
 		return nil, fmt.Errorf("no services found in %s", path)
 	}
@@ -45,12 +90,12 @@ func cmdUp(configPath string) {
 	running, _ := loadServices()
 
 	for _, name := range sortedKeys(toServiceMap(services)) {
-		cmd := services[name]
+		def := services[name]
 		if svc, ok := running[name]; ok && svc.Status == StatusRunning {
 			fmt.Printf("  %s%s%s  already running\n", dim, name, reset)
 			continue
 		}
-		cmdWatch(name, strings.Fields(cmd))
+		cmdWatch(name, strings.Fields(def.Cmd), def.Dir)
 	}
 }
 
@@ -72,8 +117,8 @@ func cmdDown(configPath string) {
 	}
 }
 
-// toServiceMap converts name->cmd map to name->*Service map for sortedKeys compatibility.
-func toServiceMap(m map[string]string) map[string]*Service {
+// toServiceMap converts ServiceDef map to Service map for sortedKeys compatibility.
+func toServiceMap(m map[string]ServiceDef) map[string]*Service {
 	out := make(map[string]*Service, len(m))
 	for k := range m {
 		out[k] = &Service{Name: k}

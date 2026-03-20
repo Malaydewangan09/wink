@@ -6,13 +6,14 @@ import (
 	"fmt"
 	"os"
 	"os/exec"
+	"path/filepath"
 	"strconv"
 	"strings"
 	"syscall"
 	"time"
 )
 
-func cmdWatch(name string, cmdArgs []string) {
+func cmdWatch(name string, cmdArgs []string, dir string) {
 	services, err := loadServices()
 	if err != nil {
 		fatal(err)
@@ -31,6 +32,14 @@ func cmdWatch(name string, cmdArgs []string) {
 	cwd, err := os.Getwd()
 	if err != nil {
 		fatal(err)
+	}
+
+	// if a specific dir was requested, resolve it relative to cwd
+	if dir != "" {
+		if !filepath.IsAbs(dir) {
+			dir = filepath.Join(cwd, dir)
+		}
+		cwd = dir
 	}
 
 	collectorArgs := append([]string{"__collect", name}, cmdArgs...)
@@ -120,10 +129,12 @@ func runCollector(name string, cmdArgs []string) {
 	startedAt := time.Now()
 	pid := cmd.Process.Pid
 	cmdStr := strings.Join(cmdArgs, " ")
+	serviceDir, _ := os.Getwd()
 	_ = updateService(name, func(services map[string]*Service) {
 		services[name] = &Service{
 			Name:      name,
 			Cmd:       cmdStr,
+			Dir:       serviceDir,
 			PID:       pid,
 			Status:    StatusRunning,
 			StartedAt: startedAt,
@@ -187,6 +198,7 @@ func cmdRestart(name string) {
 	}
 
 	savedCmd := svc.Cmd
+	savedDir := svc.Dir
 
 	// stop if running
 	if svc.Status == StatusRunning {
@@ -218,7 +230,7 @@ func cmdRestart(name string) {
 	}
 
 	fmt.Printf("  %srestarting%s  %s%s%s\n", dim, reset, bold, name, reset)
-	cmdWatch(name, strings.Fields(savedCmd))
+	cmdWatch(name, strings.Fields(savedCmd), savedDir)
 }
 
 func cmdAttach(name string, pidStr string) {

@@ -68,7 +68,7 @@ func main() {
 		if len(args) < 3 {
 			fatal(fmt.Errorf("usage: wink watch <name> <cmd> [args...]"))
 		}
-		cmdWatch(args[1], args[2:])
+		cmdWatch(args[1], args[2:], "")
 	case "attach":
 		if len(args) < 3 {
 			fatal(fmt.Errorf("usage: wink attach <name> <pid>"))

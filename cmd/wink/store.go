@@ -23,6 +23,7 @@ const (
 type Service struct {
 	Name      string    `json:"name"`
 	Cmd       string    `json:"cmd"`
+	Dir       string    `json:"dir,omitempty"`
 	PID       int       `json:"pid"`
 	Status    Status    `json:"status"`
 	StartedAt time.Time `json:"started_at"`

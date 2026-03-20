@@ -377,10 +377,22 @@ wink down</pre>
           Services already running are skipped when you run <code>wink up</code> again. Safe to re-run.
         </div>
 
-        <p>Commands in <code>wink.yaml</code> are passed to <code>sh -c</code>, so shell syntax works.</p>
+        <p>For monorepos where services live in different directories, use the extended format.</p>
+        <pre><span class="c"># extended format — explicit working dir per service</span>
+api:
+  cmd: node server.js
+  dir: ./apps/api
+
+worker:
+  cmd: python -m worker
+  dir: ./apps/worker
+
+<span class="c"># simple format still works alongside extended</span>
+redis: redis-server</pre>
+
+        <p>Commands are passed to <code>sh -c</code>, so shell syntax works in both formats.</p>
         <pre>api: PORT=3000 node server.js
-migrate: cd ./db &amp;&amp; ./migrate up
-redis: redis-server --port 6380</pre>
+migrate: cd ./db &amp;&amp; ./migrate up</pre>
       </div>
 
       <!-- commands -->
@@ -511,9 +523,15 @@ wink config set notify_cmd "~/scripts/notify.sh {msg}"</pre>
             <span class="example-title">wink.yaml</span>
             <span class="example-tag">project root</span>
           </div>
-          <pre>api:    node server.js
-worker: python -m worker
-redis:  redis-server</pre>
+          <pre>api:
+  cmd: node server.js
+  dir: ./api
+
+worker:
+  cmd: python -m worker
+  dir: ./worker
+
+redis: redis-server</pre>
         </div>
 
         <div class="example">
