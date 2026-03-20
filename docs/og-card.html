@@ -33,11 +33,9 @@
       gap: 12px;
     }
 
-    .dot {
-      width: 10px;
-      height: 10px;
-      border-radius: 50%;
-      background: #5eba8a;
+    .brand-icon {
+      width: 36px;
+      height: 36px;
     }
 
     .brand-name {
@@ -170,10 +168,14 @@
 
   <div class="left">
     <div class="brand">
-      <div class="dot"></div>
+      <svg class="brand-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+        <rect width="32" height="32" rx="6" fill="#0e0e0e"/>
+        <path d="M 5 7 L 11 24 L 16 14 L 21 24 L 27 7" fill="none" stroke="#e8e8e8" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="M 10 8 Q 16 13 22 8" fill="none" stroke="#34d399" stroke-width="2.2" stroke-linecap="round"/>
+      </svg>
       <span class="brand-name">wink</span>
     </div>
-    <div class="tagline">Watch any local process.<br>All output in one place.</div>
+    <div class="tagline">Scattered terminals, missed crashes,<br>logs everywhere. wink puts it all<br>in one place.</div>
     <div class="meta">github.com/Malaydewangan09/wink</div>
   </div>
 
@@ -187,10 +189,10 @@
     <div class="term-body">
       <div class="t-left">
         <div class="t-lbl">services</div>
-        <div class="svc sel"><span class="s on">●</span><span class="n" style="color:#5eba8a">api</span></div>
+        <div class="svc sel"><span class="s on">●</span><span class="n" style="color:#5eba8a">api</span><span style="color:#2a2a2a;margin-left:auto;font-size:9px">:3000</span></div>
         <div class="svc"><span class="s on">●</span><span class="n" style="color:#d4a04a">worker</span></div>
-        <div class="svc"><span class="s on">●</span><span class="n" style="color:#a87fd4">postgres</span></div>
-        <div class="svc"><span class="s dead">✗</span><span class="n" style="color:#c46a6a">redis</span></div>
+        <div class="svc"><span class="s on">●</span><span class="n" style="color:#a87fd4">postgres</span><span style="color:#2a2a2a;margin-left:auto;font-size:9px">:5432</span></div>
+        <div class="svc"><span class="s dead">✗</span><span class="n" style="color:#c46a6a">redis</span><span style="color:#2a2a2a;margin-left:auto;font-size:9px">:6379</span></div>
       </div>
       <div class="t-logs">
         <div class="log-hd"><span>all services</span><span>↑↓ scroll · q quit</span></div>
@@ -208,8 +210,8 @@
       </div>
     </div>
     <div class="term-foot">
-      <span>[tab] switch pane</span>
-      <span>[a] all services</span>
+      <span>[/] search  [o] open  [s] stop  [r] restart</span>
+      <span>[q] quit</span>
     </div>
   </div>
 
