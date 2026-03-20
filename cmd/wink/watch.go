@@ -13,7 +13,7 @@ import (
 	"time"
 )
 
-func cmdWatch(name string, cmdArgs []string, dir string) {
+func cmdWatch(name string, cmdArgs []string, dir string, restart bool) {
 	services, err := loadServices()
 	if err != nil {
 		fatal(err)
@@ -42,7 +42,11 @@ func cmdWatch(name string, cmdArgs []string, dir string) {
 		cwd = dir
 	}
 
-	collectorArgs := append([]string{"__collect", name}, cmdArgs...)
+	restartFlag := []string{}
+	if restart {
+		restartFlag = []string{"--restart"}
+	}
+	collectorArgs := append(append([]string{"__collect", name}, restartFlag...), cmdArgs...)
 	collector := exec.Command(self, collectorArgs...)
 	collector.Dir = cwd
 	collector.SysProcAttr = &syscall.SysProcAttr{
@@ -84,8 +88,9 @@ func cmdWatch(name string, cmdArgs []string, dir string) {
 	fmt.Printf("  %slogs: wink logs %s  |  tail: wink tail %s%s\n", dim, name, name, reset)
 }
 
-// runCollector is the daemon: starts the actual process, streams its output to the log file
-func runCollector(name string, cmdArgs []string) {
+// runCollector is the daemon: starts the actual process, streams its output to the log file.
+// If restart is true, it loops on crash until stopped intentionally.
+func runCollector(name string, cmdArgs []string, restart bool) {
 	_ = ensureDir()
 	_ = os.WriteFile(winkDir()+"/collector-err.log",
 		[]byte(fmt.Sprintf("collector started: %s %v\n", name, cmdArgs)), 0644)
@@ -108,81 +113,97 @@ func runCollector(name string, cmdArgs []string) {
 		os.Exit(1)
 	}
 
-	shellCmd := strings.Join(cmdArgs, " ")
-	cmd := exec.Command("sh", "-c", shellCmd)
-	cmd.Dir = func() string { d, _ := os.Getwd(); return d }()
-
-	stdout, err := cmd.StdoutPipe()
-	if err != nil {
-		collectorFatal(fmt.Sprintf("stdout pipe failed: %v", err))
-	}
-	stderr, err := cmd.StderrPipe()
-	if err != nil {
-		collectorFatal(fmt.Sprintf("stderr pipe failed: %v", err))
-	}
-
-	if err := cmd.Start(); err != nil {
-		collectorFatal(fmt.Sprintf("cmd.Start failed: %v (cmd=%s, cwd=%s)", err, cmdArgs[0], func() string { d, _ := os.Getwd(); return d }()))
-	}
-
-	// register service with the actual process PID (locked to avoid race with other collectors)
-	startedAt := time.Now()
-	pid := cmd.Process.Pid
 	cmdStr := strings.Join(cmdArgs, " ")
 	serviceDir, _ := os.Getwd()
-	_ = updateService(name, func(services map[string]*Service) {
-		services[name] = &Service{
-			Name:      name,
-			Cmd:       cmdStr,
-			Dir:       serviceDir,
-			PID:       pid,
-			Status:    StatusRunning,
-			StartedAt: startedAt,
+
+	for {
+		shellCmd := cmdStr
+		cmd := exec.Command("sh", "-c", shellCmd)
+		cmd.Dir = serviceDir
+
+		stdout, err := cmd.StdoutPipe()
+		if err != nil {
+			collectorFatal(fmt.Sprintf("stdout pipe failed: %v", err))
 		}
-	})
-
-	done := make(chan struct{}, 2)
-
-	go func() {
-		scanner := bufio.NewScanner(stdout)
-		for scanner.Scan() {
-			_ = appendLog(LogLine{
-				Service:   name,
-				Text:      scanner.Text(),
-				Stream:    "stdout",
-				Timestamp: time.Now(),
-			})
+		stderr, err := cmd.StderrPipe()
+		if err != nil {
+			collectorFatal(fmt.Sprintf("stderr pipe failed: %v", err))
 		}
-		done <- struct{}{}
-	}()
 
-	go func() {
-		scanner := bufio.NewScanner(stderr)
-		for scanner.Scan() {
-			_ = appendLog(LogLine{
-				Service:   name,
-				Text:      scanner.Text(),
-				Stream:    "stderr",
-				Timestamp: time.Now(),
-			})
+		if err := cmd.Start(); err != nil {
+			collectorFatal(fmt.Sprintf("cmd.Start failed: %v (cmd=%s, cwd=%s)", err, cmdArgs[0], serviceDir))
 		}
-		done <- struct{}{}
-	}()
 
-	<-done
-	<-done
+		// register service with the actual process PID (locked to avoid race with other collectors)
+		startedAt := time.Now()
+		pid := cmd.Process.Pid
+		_ = updateService(name, func(services map[string]*Service) {
+			services[name] = &Service{
+				Name:      name,
+				Cmd:       cmdStr,
+				Dir:       serviceDir,
+				PID:       pid,
+				Status:    StatusRunning,
+				Restart:   restart,
+				StartedAt: startedAt,
+			}
+		})
 
-	err = cmd.Wait()
-	stoppedAt := time.Now()
-	finalStatus := statusFromErr(err)
-	_ = updateService(name, func(services map[string]*Service) {
-		if svc, ok := services[name]; ok {
-			svc.Status = finalStatus
-			svc.StoppedAt = stoppedAt
+		done := make(chan struct{}, 2)
+
+		go func() {
+			scanner := bufio.NewScanner(stdout)
+			for scanner.Scan() {
+				_ = appendLog(LogLine{
+					Service:   name,
+					Text:      scanner.Text(),
+					Stream:    "stdout",
+					Timestamp: time.Now(),
+				})
+			}
+			done <- struct{}{}
+		}()
+
+		go func() {
+			scanner := bufio.NewScanner(stderr)
+			for scanner.Scan() {
+				_ = appendLog(LogLine{
+					Service:   name,
+					Text:      scanner.Text(),
+					Stream:    "stderr",
+					Timestamp: time.Now(),
+				})
+			}
+			done <- struct{}{}
+		}()
+
+		<-done
+		<-done
+
+		err = cmd.Wait()
+		stoppedAt := time.Now()
+		finalStatus := statusFromErr(err)
+		_ = updateService(name, func(services map[string]*Service) {
+			if svc, ok := services[name]; ok {
+				svc.Status = finalStatus
+				svc.StoppedAt = stoppedAt
+			}
+		})
+
+		if finalStatus == StatusDead {
+			notifyCrash(name)
+			if restart {
+				_ = appendLog(LogLine{
+					Service:   name,
+					Text:      "--- process crashed, restarting in 1s ---",
+					Stream:    "stdout",
+					Timestamp: time.Now(),
+				})
+				time.Sleep(1 * time.Second)
+				continue
+			}
 		}
-	})
-	if finalStatus == StatusDead {
-		notifyCrash(name)
+		break
 	}
 }
 
@@ -199,6 +220,7 @@ func cmdRestart(name string) {
 
 	savedCmd := svc.Cmd
 	savedDir := svc.Dir
+	savedRestart := svc.Restart
 
 	// stop if running
 	if svc.Status == StatusRunning {
@@ -230,7 +252,7 @@ func cmdRestart(name string) {
 	}
 
 	fmt.Printf("  %srestarting%s  %s%s%s\n", dim, reset, bold, name, reset)
-	cmdWatch(name, strings.Fields(savedCmd), savedDir)
+	cmdWatch(name, strings.Fields(savedCmd), savedDir, savedRestart)
 }
 
 func cmdAttach(name string, pidStr string) {

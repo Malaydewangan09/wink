@@ -27,7 +27,13 @@ func main() {
 		if len(args) < 3 {
 			os.Exit(1)
 		}
-		runCollector(args[1], args[2:])
+		restart := false
+		rest := args[2:]
+		if len(rest) > 0 && rest[0] == "--restart" {
+			restart = true
+			rest = rest[1:]
+		}
+		runCollector(args[1], rest, restart)
 		return
 	case "config":
 		if len(args) < 2 {
@@ -68,7 +74,7 @@ func main() {
 		if len(args) < 3 {
 			fatal(fmt.Errorf("usage: wink watch <name> <cmd> [args...]"))
 		}
-		cmdWatch(args[1], args[2:], "")
+		cmdWatch(args[1], args[2:], "", false)
 	case "attach":
 		if len(args) < 3 {
 			fatal(fmt.Errorf("usage: wink attach <name> <pid>"))

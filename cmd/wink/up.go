@@ -8,8 +8,9 @@ import (
 
 // ServiceDef holds a service definition parsed from wink.yaml.
 type ServiceDef struct {
-	Cmd string
-	Dir string
+	Cmd     string
+	Dir     string
+	Restart bool
 }
 
 // parseWinkFile supports two formats:
@@ -55,6 +56,8 @@ func parseWinkFile(path string) (map[string]ServiceDef, error) {
 				def.Cmd = val
 			case "dir":
 				def.Dir = val
+			case "restart":
+				def.Restart = val == "true" || val == "always"
 			}
 			services[currentBlock] = def
 		} else if val == "" {
@@ -95,7 +98,7 @@ func cmdUp(configPath string) {
 			fmt.Printf("  %s%s%s  already running\n", dim, name, reset)
 			continue
 		}
-		cmdWatch(name, strings.Fields(def.Cmd), def.Dir)
+		cmdWatch(name, strings.Fields(def.Cmd), def.Dir, def.Restart)
 	}
 }
 

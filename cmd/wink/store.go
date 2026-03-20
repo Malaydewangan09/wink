@@ -26,6 +26,7 @@ type Service struct {
 	Dir       string    `json:"dir,omitempty"`
 	PID       int       `json:"pid"`
 	Status    Status    `json:"status"`
+	Restart   bool      `json:"restart,omitempty"`
 	StartedAt time.Time `json:"started_at"`
 	StoppedAt time.Time `json:"stopped_at,omitempty"`
 }
