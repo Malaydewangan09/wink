@@ -26,6 +26,7 @@
       --faint: #bbb;
       --rule:  #d4d2cc;
       --term:  #131313;
+      --green: #34d399;
     }
 
     body {
@@ -43,28 +44,23 @@
       padding: 60px 40px 80px;
     }
 
-    /* ---- header ---- */
+    /* header */
     .hd {
       display: flex;
       justify-content: space-between;
       align-items: center;
       padding-bottom: 20px;
       border-bottom: 1px solid var(--rule);
-      margin-bottom: 32px;
+      margin-bottom: 40px;
     }
 
-    .brand {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
+    .brand { display: flex; align-items: center; gap: 10px; }
 
     .brand-dot {
-      width: 8px;
-      height: 8px;
+      width: 8px; height: 8px;
       border-radius: 50%;
-      background: #34d399;
-      box-shadow: 0 0 6px rgba(52, 211, 153, 0.5);
+      background: var(--green);
+      box-shadow: 0 0 6px rgba(52,211,153,0.5);
       animation: pulse 2.5s ease-in-out infinite;
     }
 
@@ -91,10 +87,8 @@
     .hd-right a { color: var(--dim); text-decoration: none; }
     .hd-right a:hover { color: var(--ink); }
 
-    /* ---- tagline ---- */
-    .tagline {
-      margin-bottom: 40px;
-    }
+    /* tagline */
+    .tagline { margin-bottom: 44px; }
 
     .tagline .main {
       font-size: 17px;
@@ -104,17 +98,14 @@
       margin-bottom: 6px;
     }
 
-    .tagline .sub {
-      font-size: 12px;
-      color: var(--dim);
-    }
+    .tagline .sub { font-size: 12px; color: var(--dim); }
 
-    /* ---- terminal ---- */
+    /* terminal */
     .term {
       background: var(--term);
       border-radius: 10px;
       overflow: hidden;
-      margin-bottom: 52px;
+      margin-bottom: 48px;
       box-shadow:
         0 1px 0 rgba(0,0,0,0.06),
         0 4px 24px rgba(0,0,0,0.18),
@@ -136,37 +127,24 @@
     .tdot.g { background: #28c840; }
 
     .term-ttl {
-      flex: 1;
-      text-align: center;
-      font-size: 11px;
-      color: #3a3a3a;
+      flex: 1; text-align: center;
+      font-size: 11px; color: #3a3a3a;
       margin-right: 33px;
     }
 
-    .term-body {
-      display: grid;
-      grid-template-columns: 156px 1fr;
-    }
+    .term-body { display: grid; grid-template-columns: 156px 1fr; }
 
-    .t-left {
-      border-right: 1px solid #1e1e1e;
-      padding: 12px 0;
-    }
+    .t-left { border-right: 1px solid #1e1e1e; padding: 12px 0; }
 
     .t-lbl {
-      font-size: 9px;
-      letter-spacing: 2px;
-      text-transform: uppercase;
-      color: #2e2e2e;
+      font-size: 9px; letter-spacing: 2px;
+      text-transform: uppercase; color: #2e2e2e;
       padding: 0 12px 10px;
     }
 
     .svc {
-      display: flex;
-      align-items: center;
-      gap: 7px;
-      padding: 7px 12px;
-      font-size: 11px;
+      display: flex; align-items: center; gap: 7px;
+      padding: 7px 12px; font-size: 11px;
       border-bottom: 1px solid #191919;
     }
 
@@ -179,21 +157,16 @@
     .t-logs { overflow: hidden; }
 
     .log-hd {
-      font-size: 9px;
-      letter-spacing: 2px;
-      text-transform: uppercase;
-      color: #2e2e2e;
-      padding: 12px 14px 7px;
-      border-bottom: 1px solid #191919;
-      display: flex;
-      justify-content: space-between;
+      font-size: 9px; letter-spacing: 2px;
+      text-transform: uppercase; color: #2e2e2e;
+      padding: 12px 14px 7px; border-bottom: 1px solid #191919;
+      display: flex; justify-content: space-between;
     }
 
     .ll {
       display: grid;
       grid-template-columns: 76px 56px 1fr;
-      font-size: 11px;
-      line-height: 1;
+      font-size: 11px; line-height: 1;
       padding: 5.5px 14px;
     }
 
@@ -206,106 +179,75 @@
     .ll-m.warn { color: #fbbf24; }
 
     .term-foot {
-      background: #1c1c1c;
-      border-top: 1px solid #252525;
-      padding: 7px 14px;
-      display: flex;
+      background: #1c1c1c; border-top: 1px solid #252525;
+      padding: 7px 14px; display: flex;
       justify-content: space-between;
-      font-size: 10px;
-      color: #333;
+      font-size: 10px; color: #333;
     }
 
-    /* ---- body grid ---- */
-    .body-grid {
+    /* install block */
+    .install-section { margin-bottom: 48px; }
+
+    .section-label {
+      font-size: 9px; letter-spacing: 3px;
+      text-transform: uppercase; color: var(--faint);
+      margin-bottom: 16px;
+    }
+
+    .install-tabs { display: flex; gap: 0; margin-bottom: 0; }
+
+    .tab-btn {
+      font-family: var(--mono);
+      font-size: 11px; color: var(--dim);
+      background: none; border: 1px solid var(--rule);
+      padding: 5px 14px; cursor: pointer;
+      border-right: none;
+    }
+
+    .tab-btn:first-child { border-radius: 5px 0 0 0; }
+    .tab-btn:last-child  { border-right: 1px solid var(--rule); border-radius: 0 5px 0 0; }
+    .tab-btn.active      { color: var(--ink); background: rgba(0,0,0,0.03); }
+
+    .install-code {
+      font-family: var(--mono); font-size: 11px; color: var(--ink);
+      background: rgba(0,0,0,0.03); border: 1px solid var(--rule);
+      border-radius: 0 5px 5px 5px;
+      padding: 14px 16px; line-height: 2.1;
+      word-break: break-all; display: none;
+    }
+
+    .install-code.active { display: block; }
+
+    /* quick features */
+    .features {
       display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 0;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1px;
+      background: var(--rule);
       border: 1px solid var(--rule);
       border-radius: 8px;
       overflow: hidden;
-      margin-bottom: 40px;
+      margin-bottom: 48px;
     }
 
-    .bg-panel {
-      padding: 28px 28px 32px;
+    .feat {
+      background: var(--bg);
+      padding: 20px 20px 22px;
     }
 
-    .bg-panel:first-child {
-      border-right: 1px solid var(--rule);
+    .feat-title {
+      font-size: 12px; font-weight: 600;
+      color: var(--ink); margin-bottom: 5px;
     }
 
-    .panel-title {
-      font-size: 9px;
-      letter-spacing: 3px;
-      text-transform: uppercase;
-      color: var(--faint);
-      margin-bottom: 20px;
-    }
+    .feat-desc { font-size: 11px; color: var(--dim); line-height: 1.6; }
 
-    /* commands */
-    .cmd-list { display: flex; flex-direction: column; }
-
-    .cmd-row {
-      display: flex;
-      align-items: baseline;
-      padding: 7px 0;
-      border-bottom: 1px solid var(--rule);
-      gap: 0;
-    }
-
-    .cmd-row:last-child { border-bottom: none; }
-
-    .cmd-row code {
-      font-family: var(--mono);
-      font-size: 12px;
-      color: var(--ink);
-      white-space: nowrap;
-      flex-shrink: 0;
-    }
-
-    .leader {
-      flex: 1;
-      border-bottom: 1px dotted var(--faint);
-      margin: 0 8px;
-      position: relative;
-      top: -3px;
-    }
-
-    .cmd-row .desc {
-      font-size: 11px;
-      color: var(--dim);
-      white-space: nowrap;
-      flex-shrink: 0;
-    }
-
-    /* install */
-    .install-list { display: flex; flex-direction: column; gap: 18px; }
-
-    .inst .plat {
-      font-size: 10px;
-      color: var(--faint);
-      margin-bottom: 5px;
-    }
-
-    .inst code {
-      font-family: var(--mono);
-      font-size: 11px;
-      color: var(--ink);
-      background: rgba(0,0,0,0.04);
-      border: 1px solid var(--rule);
-      border-radius: 5px;
-      padding: 8px 12px;
-      display: block;
-      line-height: 2;
-      word-break: break-all;
-    }
-
-    /* ---- footer ---- */
+    /* footer */
     .foot {
-      display: flex;
-      justify-content: space-between;
-      font-size: 11px;
-      color: var(--faint);
+      display: flex; justify-content: space-between;
+      font-size: 11px; color: var(--faint);
+      border-top: 1px solid var(--rule);
+      padding-top: 20px;
     }
 
     .foot a { color: var(--faint); text-decoration: none; }
@@ -315,8 +257,7 @@
       .page { padding: 32px 20px 52px; }
       .term-body { grid-template-columns: 1fr; }
       .t-left { display: none; }
-      .body-grid { grid-template-columns: 1fr; }
-      .bg-panel:first-child { border-right: none; border-bottom: 1px solid var(--rule); }
+      .features { grid-template-columns: 1fr; }
     }
   </style>
 </head>
@@ -330,6 +271,7 @@
     </div>
     <div class="hd-right">
       <span>v0.3.0</span>
+      <a href="docs.html">docs</a>
       <a href="https://github.com/Malaydewangan09/wink">github</a>
       <a href="https://github.com/Malaydewangan09/wink/releases">download</a>
     </div>
@@ -337,7 +279,7 @@
 
   <div class="tagline">
     <div class="main">All your service logs in one place.</div>
-    <div class="sub">Watch any process · stdout and stderr · search · crash alerts · single binary</div>
+    <div class="sub">Watch any process · search · crash alerts · zero config · single binary</div>
   </div>
 
   <div class="term">
@@ -357,20 +299,17 @@
       </div>
       <div class="t-logs">
         <div class="log-hd">
-          <span>all services</span>
-          <span>↑↓ scroll · q quit</span>
+          <span>api · <span style="color:#34d399">/error</span></span>
+          <span>/ search · t timestamps · q quit</span>
         </div>
         <div class="ll"><span class="ll-s" style="color:#34d399">api</span><span class="ll-t">14:22:01</span><span class="ll-m ok">listening on :3000</span></div>
         <div class="ll"><span class="ll-s" style="color:#c084fc">postgres</span><span class="ll-t">14:22:01</span><span class="ll-m">database system ready</span></div>
         <div class="ll"><span class="ll-s" style="color:#fbbf24">worker</span><span class="ll-t">14:22:02</span><span class="ll-m">connected to postgres</span></div>
         <div class="ll"><span class="ll-s" style="color:#f87171">redis</span><span class="ll-t">14:22:02</span><span class="ll-m err">connection refused :6379</span></div>
-        <div class="ll"><span class="ll-s" style="color:#fbbf24">worker</span><span class="ll-t">14:22:03</span><span class="ll-m warn">WARN redis unavailable</span></div>
+        <div class="ll"><span class="ll-s" style="color:#fbbf24">worker</span><span class="ll-t">14:22:03</span><span class="ll-m warn">WARN redis unavailable, retrying</span></div>
         <div class="ll"><span class="ll-s" style="color:#34d399">api</span><span class="ll-t">14:22:05</span><span class="ll-m">GET /users 200  12ms</span></div>
-        <div class="ll"><span class="ll-s" style="color:#fbbf24">worker</span><span class="ll-t">14:22:06</span><span class="ll-m">job queued #4421</span></div>
-        <div class="ll"><span class="ll-s" style="color:#c084fc">postgres</span><span class="ll-t">14:22:07</span><span class="ll-m">checkpoint complete: wrote 84 buffers</span></div>
-        <div class="ll"><span class="ll-s" style="color:#fbbf24">worker</span><span class="ll-t">14:22:08</span><span class="ll-m ok">job #4421 processed  230ms</span></div>
-        <div class="ll"><span class="ll-s" style="color:#34d399">api</span><span class="ll-t">14:22:09</span><span class="ll-m">POST /jobs 201  8ms</span></div>
-        <div class="ll"><span class="ll-s" style="color:#34d399">api</span><span class="ll-t">14:22:14</span><span class="ll-m err">ERROR TypeError at auth.js:42</span></div>
+        <div class="ll"><span class="ll-s" style="color:#34d399">api</span><span class="ll-t">14:22:09</span><span class="ll-m err">ERROR TypeError at auth.js:42</span></div>
+        <div class="ll"><span class="ll-s" style="color:#fbbf24">worker</span><span class="ll-t">14:22:11</span><span class="ll-m ok">job #4421 processed  230ms</span></div>
       </div>
     </div>
     <div class="term-foot">
@@ -379,53 +318,60 @@
     </div>
   </div>
 
-  <div class="body-grid">
-    <div class="bg-panel">
-      <div class="panel-title">commands</div>
-      <div class="cmd-list">
-        <div class="cmd-row"><code>wink up [wink.yaml]</code><span class="leader"></span><span class="desc">start all from config</span></div>
-        <div class="cmd-row"><code>wink down [wink.yaml]</code><span class="leader"></span><span class="desc">stop all from config</span></div>
-        <div class="cmd-row"><code>wink watch &lt;name&gt; &lt;cmd&gt;</code><span class="leader"></span><span class="desc">start a process</span></div>
-        <div class="cmd-row"><code>wink restart &lt;name&gt;</code><span class="leader"></span><span class="desc">restart a service</span></div>
-        <div class="cmd-row"><code>wink stop &lt;name&gt;</code><span class="leader"></span><span class="desc">send sigterm</span></div>
-        <div class="cmd-row"><code>wink rm &lt;name&gt;</code><span class="leader"></span><span class="desc">remove service + logs</span></div>
-        <div class="cmd-row"><code>wink ls</code><span class="leader"></span><span class="desc">list services</span></div>
-        <div class="cmd-row"><code>wink logs [name]</code><span class="leader"></span><span class="desc">print logs</span></div>
-        <div class="cmd-row"><code>wink tail [name]</code><span class="leader"></span><span class="desc">follow live</span></div>
-        <div class="cmd-row"><code>wink config edit</code><span class="leader"></span><span class="desc">edit settings</span></div>
-      </div>
+  <div class="install-section">
+    <div class="section-label">install</div>
+    <div class="install-tabs">
+      <button class="tab-btn active" onclick="showTab('arm64', this)">macOS arm64</button>
+      <button class="tab-btn" onclick="showTab('x86', this)">macOS x86_64</button>
+      <button class="tab-btn" onclick="showTab('linux', this)">linux amd64</button>
+      <button class="tab-btn" onclick="showTab('source', this)">source</button>
     </div>
-    <div class="bg-panel">
-      <div class="panel-title">install</div>
-      <div class="install-list">
-        <div class="inst">
-          <div class="plat">macOS arm64</div>
-          <code>curl -Lo wink https://github.com/Malaydewangan09/wink/releases/latest/download/wink-darwin-arm64
-chmod +x wink &amp;&amp; sudo mv wink /usr/local/bin/</code>
-        </div>
-        <div class="inst">
-          <div class="plat">macOS x86_64</div>
-          <code>curl -Lo wink https://github.com/Malaydewangan09/wink/releases/latest/download/wink-darwin-x86_64
-chmod +x wink &amp;&amp; sudo mv wink /usr/local/bin/</code>
-        </div>
-        <div class="inst">
-          <div class="plat">linux amd64</div>
-          <code>curl -Lo wink https://github.com/Malaydewangan09/wink/releases/latest/download/wink-linux-amd64
-chmod +x wink &amp;&amp; sudo mv wink /usr/local/bin/</code>
-        </div>
-        <div class="inst">
-          <div class="plat">from source</div>
-          <code>go install github.com/Malaydewangan09/wink/cmd/wink@latest</code>
-        </div>
-      </div>
+    <div id="tab-arm64" class="install-code active">curl -Lo wink https://github.com/Malaydewangan09/wink/releases/latest/download/wink-darwin-arm64<br>chmod +x wink &amp;&amp; sudo mv wink /usr/local/bin/</div>
+    <div id="tab-x86" class="install-code">curl -Lo wink https://github.com/Malaydewangan09/wink/releases/latest/download/wink-darwin-x86_64<br>chmod +x wink &amp;&amp; sudo mv wink /usr/local/bin/</div>
+    <div id="tab-linux" class="install-code">curl -Lo wink https://github.com/Malaydewangan09/wink/releases/latest/download/wink-linux-amd64<br>chmod +x wink &amp;&amp; sudo mv wink /usr/local/bin/</div>
+    <div id="tab-source" class="install-code">go install github.com/Malaydewangan09/wink/cmd/wink@latest</div>
+  </div>
+
+  <div class="features">
+    <div class="feat">
+      <div class="feat-title">aggregated logs</div>
+      <div class="feat-desc">stdout and stderr from all services in one scrollable view, color-coded by service.</div>
+    </div>
+    <div class="feat">
+      <div class="feat-title">log search</div>
+      <div class="feat-desc">press / in the TUI to filter logs by keyword across any service in real time.</div>
+    </div>
+    <div class="feat">
+      <div class="feat-title">crash alerts</div>
+      <div class="feat-desc">desktop notification when a service dies unexpectedly. configurable via notify_cmd.</div>
+    </div>
+    <div class="feat">
+      <div class="feat-title">wink up / down</div>
+      <div class="feat-desc">define services in wink.yaml and start or stop them all with one command.</div>
+    </div>
+    <div class="feat">
+      <div class="feat-title">zero config</div>
+      <div class="feat-desc">works with any process out of the box. optional config at ~/.wink/config.yaml.</div>
+    </div>
+    <div class="feat">
+      <div class="feat-title">single binary</div>
+      <div class="feat-desc">no daemon, no dependencies, no setup. drop it in PATH and it works.</div>
     </div>
   </div>
 
   <div class="foot">
-    <span>wink v0.3.0 · mit · go</span>
+    <span>wink v0.3.0 · mit · <a href="docs.html">docs</a></span>
     <a href="https://github.com/Malaydewangan09/wink">github.com/Malaydewangan09/wink</a>
   </div>
 
 </div>
+<script>
+  function showTab(id, btn) {
+    document.querySelectorAll('.install-code').forEach(el => el.classList.remove('active'));
+    document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+    document.getElementById('tab-' + id).classList.add('active');
+    btn.classList.add('active');
+  }
+</script>
 </body>
 </html>

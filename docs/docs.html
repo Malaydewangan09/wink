@@ -1,0 +1,599 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>wink · docs</title>
+  <meta name="description" content="wink documentation — commands, config, TUI controls, and examples." />
+  <link rel="icon" type="image/svg+xml" href="favicon.svg" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --mono:  'SF Mono', 'Fira Code', 'Cascadia Code', ui-monospace, monospace;
+      --bg:    #f5f4f0;
+      --ink:   #111;
+      --dim:   #888;
+      --faint: #bbb;
+      --rule:  #d4d2cc;
+      --term:  #131313;
+      --green: #34d399;
+      --sidebar: 200px;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--ink);
+      font-family: var(--mono);
+      font-size: 13px;
+      line-height: 1.7;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* header */
+    .hd {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 20px 40px;
+      border-bottom: 1px solid var(--rule);
+      position: sticky;
+      top: 0;
+      background: var(--bg);
+      z-index: 10;
+    }
+
+    .brand { display: flex; align-items: center; gap: 10px; text-decoration: none; }
+
+    .brand-dot {
+      width: 7px; height: 7px;
+      border-radius: 50%;
+      background: var(--green);
+      box-shadow: 0 0 5px rgba(52,211,153,0.5);
+    }
+
+    .brand-name {
+      font-size: 15px; font-weight: 700;
+      letter-spacing: -0.5px; color: var(--ink);
+    }
+
+    .hd-right {
+      font-size: 12px; color: var(--dim);
+      display: flex; align-items: center; gap: 20px;
+    }
+
+    .hd-right a { color: var(--dim); text-decoration: none; }
+    .hd-right a:hover { color: var(--ink); }
+
+    /* layout */
+    .layout {
+      display: grid;
+      grid-template-columns: var(--sidebar) 1fr;
+      max-width: 1020px;
+      margin: 0 auto;
+      min-height: calc(100vh - 61px);
+    }
+
+    /* sidebar */
+    .sidebar {
+      border-right: 1px solid var(--rule);
+      padding: 32px 0 60px;
+      position: sticky;
+      top: 61px;
+      height: calc(100vh - 61px);
+      overflow-y: auto;
+    }
+
+    .nav-section {
+      font-size: 9px; letter-spacing: 2.5px;
+      text-transform: uppercase; color: var(--faint);
+      padding: 0 20px 8px;
+      margin-top: 24px;
+    }
+
+    .nav-section:first-child { margin-top: 0; }
+
+    .nav-link {
+      display: block; padding: 5px 20px;
+      font-size: 12px; color: var(--dim);
+      text-decoration: none;
+    }
+
+    .nav-link:hover { color: var(--ink); }
+    .nav-link.active { color: var(--ink); }
+
+    /* content */
+    .content {
+      padding: 40px 48px 80px;
+      max-width: 720px;
+    }
+
+    /* sections */
+    .doc-section { margin-bottom: 56px; }
+
+    .doc-section h2 {
+      font-size: 15px; font-weight: 700;
+      color: var(--ink); letter-spacing: -0.3px;
+      margin-bottom: 16px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid var(--rule);
+    }
+
+    .doc-section h3 {
+      font-size: 12px; font-weight: 600;
+      color: var(--ink); margin: 24px 0 10px;
+    }
+
+    .doc-section p {
+      font-size: 12px; color: var(--dim);
+      margin-bottom: 12px; line-height: 1.75;
+    }
+
+    /* code blocks */
+    pre {
+      background: rgba(0,0,0,0.04);
+      border: 1px solid var(--rule);
+      border-radius: 6px;
+      padding: 14px 16px;
+      font-family: var(--mono);
+      font-size: 11px;
+      line-height: 1.9;
+      overflow-x: auto;
+      margin-bottom: 16px;
+      color: var(--ink);
+    }
+
+    code {
+      font-family: var(--mono);
+      font-size: 11px;
+      background: rgba(0,0,0,0.05);
+      border: 1px solid var(--rule);
+      border-radius: 3px;
+      padding: 1px 5px;
+      color: var(--ink);
+    }
+
+    pre code {
+      background: none; border: none;
+      padding: 0; border-radius: 0;
+    }
+
+    /* comment color in code blocks */
+    .c { color: #888; }
+    .k { color: #5eba8a; }
+    .s { color: #d4a04a; }
+    .e { color: #f87171; }
+
+    /* command table */
+    .cmd-table { width: 100%; border-collapse: collapse; margin-bottom: 16px; }
+
+    .cmd-table tr { border-bottom: 1px solid var(--rule); }
+    .cmd-table tr:last-child { border-bottom: none; }
+
+    .cmd-table td {
+      padding: 8px 0; vertical-align: top;
+      font-size: 11px;
+    }
+
+    .cmd-table td:first-child {
+      color: var(--ink); padding-right: 24px;
+      white-space: nowrap; width: 1%;
+    }
+
+    .cmd-table td:last-child { color: var(--dim); }
+
+    /* key table */
+    .key-table { width: 100%; border-collapse: collapse; margin-bottom: 16px; }
+    .key-table tr { border-bottom: 1px solid var(--rule); }
+    .key-table tr:last-child { border-bottom: none; }
+    .key-table td { padding: 7px 0; font-size: 11px; }
+    .key-table td:first-child {
+      width: 80px; padding-right: 20px;
+    }
+
+    .key {
+      display: inline-block;
+      font-family: var(--mono); font-size: 10px;
+      background: rgba(0,0,0,0.06);
+      border: 1px solid var(--rule);
+      border-bottom-width: 2px;
+      border-radius: 4px;
+      padding: 1px 7px;
+      color: var(--ink);
+    }
+
+    .key-table td:last-child { color: var(--dim); }
+
+    /* config table */
+    .cfg-table { width: 100%; border-collapse: collapse; margin-bottom: 16px; }
+    .cfg-table tr { border-bottom: 1px solid var(--rule); }
+    .cfg-table tr:last-child { border-bottom: none; }
+    .cfg-table th {
+      text-align: left; font-size: 9px;
+      letter-spacing: 2px; text-transform: uppercase;
+      color: var(--faint); padding: 0 0 10px;
+      font-weight: 400;
+    }
+    .cfg-table th:not(:last-child) { padding-right: 24px; }
+    .cfg-table td { padding: 8px 0; font-size: 11px; vertical-align: top; }
+    .cfg-table td:not(:last-child) { padding-right: 24px; white-space: nowrap; }
+    .cfg-table td:first-child { color: var(--ink); }
+    .cfg-table td:last-child { color: var(--dim); }
+
+    /* example card */
+    .example {
+      border: 1px solid var(--rule);
+      border-radius: 8px;
+      overflow: hidden;
+      margin-bottom: 28px;
+    }
+
+    .example-hd {
+      padding: 12px 16px;
+      border-bottom: 1px solid var(--rule);
+      display: flex; align-items: center;
+      justify-content: space-between;
+    }
+
+    .example-title {
+      font-size: 12px; font-weight: 600;
+      color: var(--ink);
+    }
+
+    .example-tag {
+      font-size: 10px; color: var(--faint);
+    }
+
+    .example pre {
+      border: none; border-radius: 0;
+      margin: 0; background: rgba(0,0,0,0.02);
+    }
+
+    /* note */
+    .note {
+      background: rgba(0,0,0,0.03);
+      border-left: 2px solid var(--rule);
+      padding: 10px 14px;
+      font-size: 11px; color: var(--dim);
+      border-radius: 0 4px 4px 0;
+      margin-bottom: 16px;
+    }
+
+    /* footer */
+    .foot {
+      border-top: 1px solid var(--rule);
+      padding: 20px 48px;
+      display: flex; justify-content: space-between;
+      font-size: 11px; color: var(--faint);
+    }
+
+    .foot a { color: var(--faint); text-decoration: none; }
+    .foot a:hover { color: var(--ink); }
+
+    @media (max-width: 700px) {
+      .hd { padding: 16px 20px; }
+      .layout { grid-template-columns: 1fr; }
+      .sidebar { display: none; }
+      .content { padding: 28px 20px 60px; }
+      .foot { padding: 16px 20px; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="hd">
+    <a class="brand" href="index.html">
+      <div class="brand-dot"></div>
+      <span class="brand-name">wink</span>
+    </a>
+    <div class="hd-right">
+      <span style="color:var(--ink)">docs</span>
+      <a href="https://github.com/Malaydewangan09/wink">github</a>
+      <a href="https://github.com/Malaydewangan09/wink/releases">download</a>
+    </div>
+  </div>
+
+  <div class="layout">
+    <nav class="sidebar">
+      <div class="nav-section">guide</div>
+      <a class="nav-link" href="#getting-started">getting started</a>
+      <a class="nav-link" href="#wink-yaml">wink.yaml</a>
+
+      <div class="nav-section">reference</div>
+      <a class="nav-link" href="#commands">commands</a>
+      <a class="nav-link" href="#tui">TUI controls</a>
+      <a class="nav-link" href="#config">config</a>
+
+      <div class="nav-section">examples</div>
+      <a class="nav-link" href="#ex-node">node + python</a>
+      <a class="nav-link" href="#ex-go">go services</a>
+      <a class="nav-link" href="#ex-java">java + react</a>
+      <a class="nav-link" href="#ex-attach">attach to pid</a>
+    </nav>
+
+    <div class="content">
+
+      <!-- getting started -->
+      <div class="doc-section" id="getting-started">
+        <h2>getting started</h2>
+        <p>Install the binary for your platform.</p>
+        <pre><span class="c"># macOS arm64</span>
+curl -Lo wink https://github.com/Malaydewangan09/wink/releases/latest/download/wink-darwin-arm64
+chmod +x wink &amp;&amp; sudo mv wink /usr/local/bin/
+
+<span class="c"># macOS x86_64</span>
+curl -Lo wink https://github.com/Malaydewangan09/wink/releases/latest/download/wink-darwin-x86_64
+chmod +x wink &amp;&amp; sudo mv wink /usr/local/bin/
+
+<span class="c"># Linux amd64</span>
+curl -Lo wink https://github.com/Malaydewangan09/wink/releases/latest/download/wink-linux-amd64
+chmod +x wink &amp;&amp; sudo mv wink /usr/local/bin/
+
+<span class="c"># from source</span>
+go install github.com/Malaydewangan09/wink/cmd/wink@latest</pre>
+
+        <p>Watch your first process.</p>
+        <pre>wink watch api "node server.js"</pre>
+
+        <p>Open the TUI to see live logs.</p>
+        <pre>wink</pre>
+
+        <p>Watch more services. They show up immediately in the running TUI.</p>
+        <pre>wink watch worker "python worker.py"
+wink watch db "postgres -D /usr/local/var/postgres"</pre>
+
+        <p>To stop and clean up.</p>
+        <pre>wink stop api
+wink rm api      <span class="c"># removes service + its logs</span></pre>
+      </div>
+
+      <!-- wink.yaml -->
+      <div class="doc-section" id="wink-yaml">
+        <h2>wink.yaml</h2>
+        <p>Define all your services in a file and start them with one command. Create <code>wink.yaml</code> in any directory.</p>
+        <pre><span class="c"># wink.yaml</span>
+<span class="c"># format: name: command</span>
+<span class="c"># lines starting with # are comments</span>
+
+api: go run ./cmd/api
+worker: ./bin/worker --env dev
+postgres: postgres -D /usr/local/var/postgresql</pre>
+
+        <p>Then from the same directory.</p>
+        <pre><span class="c"># start all services</span>
+wink up
+
+<span class="c"># start all, pass a different config file</span>
+wink up ./config/services.yaml
+
+<span class="c"># stop all services defined in wink.yaml</span>
+wink down</pre>
+
+        <div class="note">
+          Services already running are skipped when you run <code>wink up</code> again. Safe to re-run.
+        </div>
+
+        <p>Commands in <code>wink.yaml</code> are passed to <code>sh -c</code>, so shell syntax works.</p>
+        <pre>api: PORT=3000 node server.js
+migrate: cd ./db &amp;&amp; ./migrate up
+redis: redis-server --port 6380</pre>
+      </div>
+
+      <!-- commands -->
+      <div class="doc-section" id="commands">
+        <h2>commands</h2>
+
+        <h3>config file</h3>
+        <table class="cmd-table">
+          <tr><td><code>wink up [file]</code></td><td>start all services from wink.yaml (default: ./wink.yaml)</td></tr>
+          <tr><td><code>wink down [file]</code></td><td>stop all services defined in config file</td></tr>
+        </table>
+
+        <h3>process management</h3>
+        <table class="cmd-table">
+          <tr><td><code>wink watch &lt;name&gt; &lt;cmd&gt;</code></td><td>start a process and collect its stdout and stderr</td></tr>
+          <tr><td><code>wink stop &lt;name&gt;</code></td><td>send SIGTERM to a running service</td></tr>
+          <tr><td><code>wink restart &lt;name&gt;</code></td><td>stop and restart with the same command, clears old logs</td></tr>
+          <tr><td><code>wink rm &lt;name&gt;</code></td><td>remove a stopped service and all its logs</td></tr>
+          <tr><td><code>wink attach &lt;name&gt; &lt;pid&gt;</code></td><td>register an already-running process by PID (no log collection)</td></tr>
+        </table>
+
+        <h3>viewing</h3>
+        <table class="cmd-table">
+          <tr><td><code>wink</code></td><td>open the live TUI</td></tr>
+          <tr><td><code>wink ls</code></td><td>list all services, status, and uptime</td></tr>
+          <tr><td><code>wink logs [name]</code></td><td>print all logs, optionally filtered by service</td></tr>
+          <tr><td><code>wink tail [name]</code></td><td>follow logs in real time (like tail -f)</td></tr>
+          <tr><td><code>wink clear</code></td><td>delete all logs and service state</td></tr>
+        </table>
+
+        <h3>settings</h3>
+        <table class="cmd-table">
+          <tr><td><code>wink config show</code></td><td>print current config values and file path</td></tr>
+          <tr><td><code>wink config edit</code></td><td>open config file in $EDITOR</td></tr>
+          <tr><td><code>wink config set &lt;key&gt; &lt;val&gt;</code></td><td>set a config value</td></tr>
+          <tr><td><code>wink config unset &lt;key&gt;</code></td><td>reset a config value to its default</td></tr>
+        </table>
+      </div>
+
+      <!-- TUI -->
+      <div class="doc-section" id="tui">
+        <h2>TUI controls</h2>
+        <p>Run <code>wink</code> with no arguments to open the TUI. The left pane lists services, the right pane shows logs.</p>
+
+        <h3>navigation</h3>
+        <table class="key-table">
+          <tr><td><span class="key">↑</span> <span class="key">↓</span></td><td>navigate services (left pane) or scroll logs (right pane)</td></tr>
+          <tr><td><span class="key">tab</span></td><td>switch focus between services and logs pane</td></tr>
+          <tr><td><span class="key">g</span></td><td>jump to oldest logs (top)</td></tr>
+          <tr><td><span class="key">G</span></td><td>jump to newest logs (bottom)</td></tr>
+        </table>
+
+        <h3>filtering</h3>
+        <table class="key-table">
+          <tr><td><span class="key">a</span></td><td>show logs from all services</td></tr>
+          <tr><td><span class="key">/</span></td><td>enter search mode — type to filter logs by keyword</td></tr>
+          <tr><td><span class="key">enter</span></td><td>apply search and exit search mode (keeps filter active)</td></tr>
+          <tr><td><span class="key">esc</span></td><td>clear search query</td></tr>
+        </table>
+
+        <h3>display</h3>
+        <table class="key-table">
+          <tr><td><span class="key">t</span></td><td>toggle timestamps on/off</td></tr>
+        </table>
+
+        <h3>service actions</h3>
+        <table class="key-table">
+          <tr><td><span class="key">s</span></td><td>stop the selected service (sends SIGTERM)</td></tr>
+          <tr><td><span class="key">r</span></td><td>restart the selected service (clears old logs)</td></tr>
+          <tr><td><span class="key">x</span></td><td>remove selected service — press twice to confirm, <span class="key">esc</span> to cancel</td></tr>
+          <tr><td><span class="key">q</span></td><td>quit wink (does not stop services)</td></tr>
+        </table>
+      </div>
+
+      <!-- config -->
+      <div class="doc-section" id="config">
+        <h2>config</h2>
+        <p>Settings live in <code>~/.wink/config.yaml</code>. The file is created with comments on first use.</p>
+        <pre><span class="c"># open in your editor</span>
+wink config edit
+
+<span class="c"># or set directly</span>
+wink config set notify_cmd "terminal-notifier -title wink -message {msg}"
+wink config set max_log_lines 5000</pre>
+
+        <table class="cfg-table">
+          <thead>
+            <tr>
+              <th>key</th>
+              <th>default</th>
+              <th>description</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><code>notify_cmd</code></td>
+              <td>platform default</td>
+              <td>shell command to run on crash. use <code>{msg}</code> as placeholder for the message.</td>
+            </tr>
+            <tr>
+              <td><code>max_log_lines</code></td>
+              <td>0 (no limit)</td>
+              <td>cap total lines in logs.jsonl. oldest lines trimmed automatically every 100 appends.</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <h3>crash notifications</h3>
+        <p>wink sends a notification when a service exits with a non-zero code. Intentional stops via SIGTERM are not treated as crashes.</p>
+        <p>Platform defaults: <code>osascript</code> on macOS, <code>notify-send</code> on Linux. Override with any tool using <code>notify_cmd</code>.</p>
+        <pre><span class="c"># terminal-notifier (brew install terminal-notifier)</span>
+wink config set notify_cmd "terminal-notifier -title wink -message {msg} -sound Basso"
+
+<span class="c"># alerter</span>
+wink config set notify_cmd "alerter -title wink -message {msg}"
+
+<span class="c"># any custom script</span>
+wink config set notify_cmd "~/scripts/notify.sh {msg}"</pre>
+      </div>
+
+      <!-- examples -->
+      <div class="doc-section" id="ex-node">
+        <h2>example: node + python worker</h2>
+        <p>A typical web app with an API server and a background job processor.</p>
+
+        <div class="example">
+          <div class="example-hd">
+            <span class="example-title">wink.yaml</span>
+            <span class="example-tag">project root</span>
+          </div>
+          <pre>api:    node server.js
+worker: python -m worker
+redis:  redis-server</pre>
+        </div>
+
+        <div class="example">
+          <div class="example-hd">
+            <span class="example-title">start everything</span>
+          </div>
+          <pre>wink up</pre>
+        </div>
+
+        <p>Open <code>wink</code>, select <code>worker</code> in the left pane to see only its logs. Press <code>/</code> and type <code>error</code> to find failures fast. Press <code>r</code> to restart a service without leaving the TUI.</p>
+      </div>
+
+      <div class="doc-section" id="ex-go">
+        <h2>example: go microservices</h2>
+        <p>Multiple Go services in a monorepo, each in their own directory.</p>
+
+        <div class="example">
+          <div class="example-hd">
+            <span class="example-title">wink.yaml</span>
+          </div>
+          <pre>gateway:  go run ./cmd/gateway
+users:    go run ./cmd/users
+orders:   go run ./cmd/orders
+postgres: postgres -D /usr/local/var/postgresql</pre>
+        </div>
+
+        <p>Services share the same log view. When <code>orders</code> panics and crashes, you get a desktop notification and the service shows as dead in the sidebar. Press <code>r</code> to restart it after fixing the code.</p>
+
+        <div class="example">
+          <div class="example-hd">
+            <span class="example-title">watch a single service with env vars</span>
+          </div>
+          <pre>wink watch gateway "DEBUG=true go run ./cmd/gateway"</pre>
+        </div>
+      </div>
+
+      <div class="doc-section" id="ex-java">
+        <h2>example: java backend + react frontend</h2>
+        <p>Spring Boot API alongside a Vite dev server.</p>
+
+        <div class="example">
+          <div class="example-hd">
+            <span class="example-title">wink.yaml</span>
+          </div>
+          <pre>api:      ./mvnw spring-boot:run
+frontend: npm run dev --prefix ./frontend</pre>
+        </div>
+
+        <div class="note">
+          Spring Boot logs are verbose. Use <code>max_log_lines: 2000</code> in config to keep logs.jsonl from growing too large.
+        </div>
+
+        <p>Java stack traces show up on stderr, which wink renders slightly dimmer to reduce noise. Exception lines are colored red so they stand out.</p>
+      </div>
+
+      <div class="doc-section" id="ex-attach">
+        <h2>example: attach to a running process</h2>
+        <p>If a process is already running (started externally or before wink was installed), register it by PID.</p>
+
+        <div class="example">
+          <div class="example-hd">
+            <span class="example-title">attach by pid</span>
+          </div>
+          <pre><span class="c"># find the pid</span>
+lsof -i :3000
+
+<span class="c"># register it</span>
+wink attach api 81234</pre>
+        </div>
+
+        <div class="note">
+          Attached processes show up in <code>wink ls</code> and the TUI, but wink cannot collect their logs since the pipe was not set up at start.
+        </div>
+
+        <p>To get logs from an attached process, stop it, then restart with <code>wink watch</code>.</p>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="foot">
+    <span>wink v0.3.0 · mit</span>
+    <a href="https://github.com/Malaydewangan09/wink">github.com/Malaydewangan09/wink</a>
+  </div>
+
+</body>
+</html>
