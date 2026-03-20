@@ -1,10 +1,12 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
   <title>wink</title>
   <rect width="32" height="32" rx="8" fill="#0e0e0e"/>
-  <!-- the dot from ;) -->
-  <circle cx="16" cy="10" r="2.5" fill="#34d399"/>
-  <!-- the wink curve -->
-  <path d="M 7 19 Q 16 26 25 19"
-        fill="none" stroke="#e8e8e8" stroke-width="3"
+  <!-- W: the name -->
+  <path d="M 6 7 L 11 17 L 16 11 L 21 17 L 26 7"
+        fill="none" stroke="#e8e8e8" stroke-width="2.8"
+        stroke-linecap="round" stroke-linejoin="round"/>
+  <!-- wink curve: what it does -->
+  <path d="M 7 22 Q 16 29 25 22"
+        fill="none" stroke="#34d399" stroke-width="2.8"
         stroke-linecap="round"/>
 </svg>
