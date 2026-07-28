@@ -1,0 +1,4 @@
+# Demo services for the vhs recording. Run from the repo root.
+api: bash demo/api.sh
+worker: bash demo/worker.sh
+redis: bash demo/redis.sh

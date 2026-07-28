@@ -2,6 +2,12 @@
 
 Log aggregator for local dev services. Watch any process, see all output in one place.
 
+wink watches, so you can look away. It taps you on the shoulder when something dies.
+
+<p align="center">
+  <img src="demo/wink.gif" alt="wink TUI: three services streaming logs in one pane, redis crashes and goes dead, a search across every service finds the error" width="900">
+</p>
+
 ```
 wink watch api "node server.js"
 wink watch worker "python worker.py"
